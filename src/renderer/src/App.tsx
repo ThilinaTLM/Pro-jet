@@ -1,3 +1,4 @@
+import { Button } from '@renderer/components/ui/button'
 import Versions from './components/Versions'
 
 function App(): React.JSX.Element {
@@ -6,9 +7,7 @@ function App(): React.JSX.Element {
   return (
     <>
       <Versions />
-      <button className="bg-blue-500 text-white p-2 rounded-md" onClick={ipcHandle}>
-        Ping
-      </button>
+      <Button onClick={ipcHandle}>Ping</Button>
     </>
   )
 }
