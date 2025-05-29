@@ -1,18 +1,12 @@
-/// <reference types="vite/client" />
-
-import { Repo } from './models'
+import { ElectronAPI } from '@electron-toolkit/preload'
+import { Repo, EditorConfig } from 'src/common/models'
 
 declare global {
   interface Window {
-    electron: {
-      ipcRenderer: {
-        invoke: (channel: string, ...args: any[]) => Promise<any>
-        on: (channel: string, func: (...args: any[]) => void) => void
-        removeAllListeners: (channel: string) => void
-      }
-    }
+    electron: ElectronAPI
     api: {
       selectDirectory: () => Promise<string | null>
+      checkIsDirectory: (file: File) => Promise<string | null>
       launchCursor: (directoryPath: string) => Promise<{ success: boolean; error?: string }>
       launchVscode: (directoryPath: string) => Promise<{ success: boolean; error?: string }>
       launchTerminal: (directoryPath: string) => Promise<{ success: boolean; error?: string }>
@@ -23,11 +17,9 @@ declare global {
         setRepos: (repos: Repo[]) => Promise<void>
         getTheme: () => Promise<'light' | 'dark' | 'system'>
         setTheme: (theme: 'light' | 'dark' | 'system') => Promise<void>
-        getEditors: () => Promise<any>
-        setEditors: (editors: any) => Promise<void>
+        getEditors: () => Promise<EditorConfig>
+        setEditors: (editors: EditorConfig) => Promise<void>
       }
     }
   }
 }
-
-export {}

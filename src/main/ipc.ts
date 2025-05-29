@@ -1,5 +1,6 @@
-import { ipcMain, dialog, app } from 'electron'
+import { ipcMain, dialog, app, webUtils } from 'electron'
 import { spawn } from 'child_process'
+import { promises as fs } from 'fs'
 import { getStore } from './store'
 import { Repo, EditorConfig } from '@common/models'
 import { IpcEvents } from '@common/ipc-events'
@@ -61,6 +62,21 @@ export function setupIpcHandlers(): void {
       return result.filePaths[0]
     }
     return null
+  })
+
+  // Check if path is directory handler
+  ipcMain.handle(IpcEvents.CheckIsDirectory, async (_, file: File) => {
+    try {
+      const path = await webUtils.getPathForFile(file)
+      const stats = await fs.stat(path)
+      if (stats.isDirectory()) {
+        return path
+      }
+      return null
+    } catch (error) {
+      console.error('Error checking if path is directory:', error)
+      return null
+    }
   })
 
   ipcMain.handle(IpcEvents.LaunchCursor, async (_, directoryPath: string) => {

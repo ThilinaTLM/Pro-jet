@@ -7,6 +7,7 @@ import { IpcEvents } from '@common/ipc-events'
 const api = {
   closeWindow: () => ipcRenderer.invoke(IpcEvents.CloseWindow),
   selectDirectory: () => ipcRenderer.invoke(IpcEvents.SelectDirectory),
+  checkIsDirectory: (file: File) => ipcRenderer.invoke(IpcEvents.CheckIsDirectory, file),
   launchCursor: (directoryPath: string) =>
     ipcRenderer.invoke(IpcEvents.LaunchCursor, directoryPath),
   launchVscode: (directoryPath: string) =>
@@ -40,8 +41,6 @@ if (process.contextIsolated) {
     console.error(error)
   }
 } else {
-  // @ts-ignore (define in dts)
   window.electron = electronAPI
-  // @ts-ignore (define in dts)
   window.api = api
 }
