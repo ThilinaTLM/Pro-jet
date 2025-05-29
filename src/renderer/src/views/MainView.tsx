@@ -4,32 +4,18 @@ import { Badge } from '@renderer/components/ui/badge'
 import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import { useRepos } from '@renderer/hooks/repos'
 import { useState } from 'react'
+import { formatPath } from '@renderer/lib/path'
+import { formatLastAccessed } from '@renderer/lib/date'
 
 const MainView: React.FC = () => {
   const { repos, addRepo, removeRepo, updateLastOpened } = useRepos()
   const [isAddingDirectory, setIsAddingDirectory] = useState(false)
 
-  const formatPath = (path: string): string => {
-    const parts = path.split('/')
-    return parts[parts.length - 1] || path
-  }
-
-  const formatLastAccessed = (date?: Date): string => {
-    if (!date) return 'Never'
-    if (typeof date === 'string') {
-      date = new Date(date)
-    }
-    return new Intl.RelativeTimeFormat('en', { numeric: 'auto' }).format(
-      Math.floor((date.getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
-      'day'
-    )
-  }
-
-  const handleRemoveDirectory = (path: string) => {
+  const onRemove = (path: string) => {
     removeRepo(path)
   }
 
-  const handleAddDirectory = async () => {
+  const onAdd = async () => {
     setIsAddingDirectory(true)
     try {
       const selectedPath = await window.api.selectDirectory()
@@ -48,15 +34,13 @@ const MainView: React.FC = () => {
     }
   }
 
-  const handleLaunchCursor = async (path: string) => {
+  const onLaunchCursor = async (path: string) => {
     try {
       const result = await window.api.launchCursor(path)
       if (result.success) {
-        // Update last opened time
         updateLastOpened(path)
       } else {
         console.error('Failed to launch Cursor:', result.error)
-        // You could show a toast notification here
       }
     } catch (error) {
       console.error('Failed to launch Cursor:', error)
@@ -80,11 +64,7 @@ const MainView: React.FC = () => {
             </div>
           </div>
         </div>
-        <Button
-          onClick={handleAddDirectory}
-          className="w-full gap-2 h-10"
-          disabled={isAddingDirectory}
-        >
+        <Button onClick={onAdd} className="w-full gap-2 h-10" disabled={isAddingDirectory}>
           <Plus className="h-4 w-4" />
           {isAddingDirectory ? 'Adding Directory...' : 'Add Directory'}
         </Button>
@@ -120,7 +100,10 @@ const MainView: React.FC = () => {
                         {formatLastAccessed(repo.lastOpened)}
                       </Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground truncate leading-4" title={repo.path}>
+                    <p
+                      className="text-xs text-muted-foreground truncate leading-4"
+                      title={repo.path}
+                    >
                       {repo.path}
                     </p>
                   </div>
@@ -130,7 +113,7 @@ const MainView: React.FC = () => {
                     <Button
                       variant="default"
                       size="sm"
-                      onClick={() => handleLaunchCursor(repo.path)}
+                      onClick={() => onLaunchCursor(repo.path)}
                       className="flex-1 gap-2 h-9"
                     >
                       <ExternalLink className="h-4 w-4" />
@@ -139,7 +122,7 @@ const MainView: React.FC = () => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleRemoveDirectory(repo.path)}
+                      onClick={() => onRemove(repo.path)}
                       className="h-9 w-9 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                       title="Remove directory"
                     >
