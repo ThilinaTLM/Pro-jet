@@ -1,10 +1,9 @@
 {
-  "name": "demo",
-  "version": "1.0.0",
-  "description": "An Electron application with React and TypeScript",
+  "name": "projet",
+  "version": "0.1.0",
+  "description": "A workspace manager for coding projects",
   "main": "./out/main/index.js",
-  "author": "example.com",
-  "homepage": "https://electron-vite.org",
+  "author": "Thilina Lakshan",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint --cache .",

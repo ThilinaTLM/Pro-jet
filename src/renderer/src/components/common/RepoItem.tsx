@@ -1,6 +1,6 @@
 import { formatPath } from '@renderer/lib/path'
 import { formatLastAccessed } from '@renderer/lib/date'
-import { Repo } from '@renderer/models'
+import { Repo } from 'src/common/models'
 import { Trash2 } from 'lucide-react'
 import { Button } from '@renderer/components/ui/button'
 import cursorIcon from '@renderer/assets/cursor-app-icon.png'

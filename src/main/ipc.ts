@@ -1,7 +1,7 @@
 import { ipcMain, dialog } from 'electron'
 import { spawn } from 'child_process'
 import { getStore } from './store'
-import { Repo } from '../renderer/src/models'
+import { Repo } from 'src/common/models'
 
 export function setupIpcHandlers(): void {
   // Store handlers
