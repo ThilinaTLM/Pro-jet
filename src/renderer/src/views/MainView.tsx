@@ -3,10 +3,17 @@ import { FolderOpen, Plus } from 'lucide-react'
 import { useRepos } from '@renderer/hooks/repos'
 import { useState } from 'react'
 import RepoItem from '@renderer/components/common/RepoItem'
+import { AnimatePresence, motion } from 'framer-motion'
 
 const MainView: React.FC = () => {
   const { repos, addRepo, removeRepo, updateLastOpened, isLoading } = useRepos()
   const [isAddingDirectory, setIsAddingDirectory] = useState(false)
+
+  const sortedRepos = repos.sort((a, b) => {
+    const aLastOpened = a.lastOpened.getTime()
+    const bLastOpened = b.lastOpened.getTime()
+    return bLastOpened - aLastOpened
+  })
 
   const onRemove = (path: string) => {
     removeRepo(path)
@@ -58,14 +65,29 @@ const MainView: React.FC = () => {
           </div>
         ) : (
           <div className="px-1 space-y-4">
-            {repos.map((repo) => (
-              <RepoItem
-                key={repo.path}
-                repo={repo}
-                onRemove={onRemove}
-                updateLastOpened={updateLastOpened}
-              />
-            ))}
+            <AnimatePresence mode="popLayout">
+              {sortedRepos.map((repo) => (
+                <motion.div
+                  key={repo.path}
+                  layout
+                  initial={{ opacity: 0, y: 80 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -80 }}
+                  transition={{
+                    layout: { duration: 0.3, ease: 'easeInOut' },
+                    opacity: { duration: 0.2 },
+                    y: { duration: 0.2 }
+                  }}
+                >
+                  <RepoItem
+                    key={repo.path}
+                    repo={repo}
+                    onRemove={onRemove}
+                    updateLastOpened={updateLastOpened}
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
         )}
       </div>
@@ -79,6 +101,9 @@ const MainView: React.FC = () => {
         >
           <Plus className="h-4 w-4" />
         </Button>
+      </div>
+      <div className="flex-shrink-0 px-4 py-2 flex justify-center items-center">
+        {/* drop zone */}
       </div>
     </div>
   )
