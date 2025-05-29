@@ -14,7 +14,7 @@ function App() {
   }
 
   return (
-    <div className="bg-background text-foreground flex flex-col h-screen">
+    <div className="bg-background text-foreground flex flex-col h-screen border-1 border-muted-foreground/30">
       <Header
         descriptions={{
           main: getMainDescription(),
