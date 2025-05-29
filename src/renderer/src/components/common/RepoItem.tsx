@@ -1,6 +1,6 @@
 import { formatPath, getPathSummary } from '@renderer/lib/path'
 import { Repo } from 'src/common/models'
-import { Trash2, ChevronRight } from 'lucide-react'
+import { Trash2, ChevronRight, CheckIcon } from 'lucide-react'
 import { Button } from '@renderer/components/ui/button'
 import cursorIcon from '@renderer/assets/cursor-app-icon.png'
 import vscodeIcon from '@renderer/assets/vscode-svgrepo-com.svg'
@@ -107,8 +107,10 @@ const RepoItem: React.FC<RepoItemProps> = ({ repo, onRemove, updateLastOpened })
             variant="outline"
             size="sm"
             onClick={() => onLaunchTerminal(repo.path)}
-            className="w-fit"
+            className="w-11"
             title="Open in Terminal"
+            clickResetDelay={1000}
+            clickChildren={<CheckIcon />}
           >
             <img src={terminalIcon} alt="Terminal" className="h-4 w-4 dark:invert" />
           </Button>
@@ -116,8 +118,10 @@ const RepoItem: React.FC<RepoItemProps> = ({ repo, onRemove, updateLastOpened })
             variant="outline"
             size="sm"
             onClick={() => onLaunchVscode(repo.path)}
-            className="w-fit"
+            className="w-11"
             title="Open in VS Code"
+            clickResetDelay={1000}
+            clickChildren={<CheckIcon />}
           >
             <img src={vscodeIcon} alt="VS Code" className="h-4 w-4" />
           </Button>
@@ -125,8 +129,10 @@ const RepoItem: React.FC<RepoItemProps> = ({ repo, onRemove, updateLastOpened })
             variant="outline"
             size="sm"
             onClick={() => onLaunchIdea(repo.path)}
-            className="w-fit"
+            className="w-11"
             title="Open in IntelliJ IDEA"
+            clickResetDelay={1000}
+            clickChildren={<CheckIcon />}
           >
             <img src={ideaIcon} alt="IntelliJ IDEA" className="h-4 w-4" />
           </Button>
@@ -134,8 +140,10 @@ const RepoItem: React.FC<RepoItemProps> = ({ repo, onRemove, updateLastOpened })
             variant="outline"
             size="sm"
             onClick={() => onLaunchCursor(repo.path)}
-            className="w-fit"
+            className="w-11"
             title="Open in Cursor"
+            clickResetDelay={1000}
+            clickChildren={<CheckIcon />}
           >
             <img src={cursorIcon} alt="Cursor" className="h-4 w-4" />
           </Button>

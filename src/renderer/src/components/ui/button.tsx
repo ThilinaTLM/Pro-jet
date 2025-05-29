@@ -37,19 +37,56 @@ function Button({
   variant,
   size,
   asChild = false,
+  clickResetDelay,
+  clickChildren,
+  onClick,
+  children,
   ...props
 }: React.ComponentProps<'button'> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean
+    clickResetDelay?: number
+    clickChildren?: React.ReactNode
   }) {
+  const [showClickReset, setShowClickReset] = React.useState(false)
+  const timeoutRef = React.useRef<NodeJS.Timeout | null>(null)
+
+  const handleClick = React.useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      onClick?.(event)
+
+      if (clickResetDelay && clickChildren) {
+        setShowClickReset(true)
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current)
+        }
+        timeoutRef.current = setTimeout(() => {
+          setShowClickReset(false)
+        }, clickResetDelay)
+      }
+    },
+    [onClick, clickResetDelay, clickChildren]
+  )
+
+  React.useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [])
+
   const Comp = asChild ? Slot : 'button'
 
   return (
     <Comp
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
+      onClick={handleClick}
       {...props}
-    />
+    >
+      {showClickReset ? clickChildren : children}
+    </Comp>
   )
 }
 

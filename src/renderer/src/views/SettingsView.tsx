@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { EditorConfig } from '@common/models'
 import { Button } from '@renderer/components/ui/button'
 import { useTheme } from '@renderer/components/context/ThemeProvider'
+import { CheckIcon } from 'lucide-react'
 
 const SettingsView = () => {
   const { theme, setTheme } = useTheme()
@@ -82,7 +83,7 @@ const SettingsView = () => {
           {/* Theme Settings */}
           <div className="bg-background border border-border rounded-lg p-3">
             <h3 className="text-sm font-medium mb-3 text-foreground">Theme</h3>
-            <div className="flex gap-2">
+            <div className="grid grid-cols-3 gap-2">
               {(['light', 'dark', 'system'] as const).map((themeOption) => (
                 <Button
                   key={themeOption}
@@ -90,6 +91,8 @@ const SettingsView = () => {
                   variant={theme === themeOption ? 'default' : 'outline'}
                   size="sm"
                   className="text-xs capitalize"
+                  clickResetDelay={1000}
+                  clickChildren={<CheckIcon />}
                 >
                   {themeOption}
                 </Button>
@@ -101,7 +104,13 @@ const SettingsView = () => {
           <div className="bg-background border border-border rounded-lg p-3">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-medium text-foreground">Editor Configurations</h3>
-              <Button onClick={saveEditorSettings} size="sm" className="text-xs">
+              <Button
+                onClick={saveEditorSettings}
+                size="sm"
+                className="text-xs w-16"
+                clickResetDelay={1000}
+                clickChildren={<CheckIcon />}
+              >
                 Save
               </Button>
             </div>

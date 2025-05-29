@@ -1,4 +1,4 @@
-import { FolderOpen, Settings } from 'lucide-react'
+import { FolderOpen, Rocket, Settings } from 'lucide-react'
 import { cn } from '@renderer/lib/utils'
 import { X } from 'lucide-react'
 import { Button } from '../ui/button'
@@ -21,10 +21,10 @@ const Header = ({ descriptions }: HeaderProps) => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-primary/10">
-            <FolderOpen className="h-5 w-5 text-primary" />
+            <Rocket className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h1 className="text-lg font-semibold text-foreground">Projet</h1>
+            <h1 className="text-lg font-semibold text-foreground">Pro-jet</h1>
             <p className="text-xs text-muted-foreground">{descriptions[route]}</p>
           </div>
         </div>
