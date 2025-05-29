@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
-import { Repo } from '@common/models'
+import { Repo, EditorConfig } from '@common/models'
 import { IpcEvents } from '@common/ipc-events'
 
 // Custom APIs for renderer
@@ -23,8 +23,8 @@ const api = {
       ipcRenderer.invoke(IpcEvents.StoreGetTheme),
     setTheme: (theme: 'light' | 'dark' | 'system'): Promise<void> =>
       ipcRenderer.invoke(IpcEvents.StoreSetTheme, theme),
-    getEditors: () => ipcRenderer.invoke(IpcEvents.StoreGetEditors),
-    setEditors: (editors: any) => ipcRenderer.invoke(IpcEvents.StoreSetEditors, editors)
+    getEditors: (): Promise<EditorConfig> => ipcRenderer.invoke(IpcEvents.StoreGetEditors),
+    setEditors: (editors: EditorConfig): Promise<void> => ipcRenderer.invoke(IpcEvents.StoreSetEditors, editors)
   }
 }
 

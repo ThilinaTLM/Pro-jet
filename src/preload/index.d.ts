@@ -1,5 +1,5 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
-import { Repo } from 'src/common/models'
+import { Repo, EditorConfig } from 'src/common/models'
 
 declare global {
   interface Window {
@@ -16,8 +16,8 @@ declare global {
         setRepos: (repos: Repo[]) => Promise<void>
         getTheme: () => Promise<'light' | 'dark' | 'system'>
         setTheme: (theme: 'light' | 'dark' | 'system') => Promise<void>
-        getEditors: () => Promise<any>
-        setEditors: (editors: any) => Promise<void>
+        getEditors: () => Promise<EditorConfig>
+        setEditors: (editors: EditorConfig) => Promise<void>
       }
     }
   }
