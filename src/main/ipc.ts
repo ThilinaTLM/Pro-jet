@@ -1,7 +1,7 @@
 import { ipcMain, dialog, app } from 'electron'
 import { spawn } from 'child_process'
 import { getStore } from './store'
-import { Repo } from '@common/models'
+import { Repo, EditorConfig } from '@common/models'
 import { IpcEvents } from '@common/ipc-events'
 
 export function setupIpcHandlers(): void {
@@ -36,6 +36,16 @@ export function setupIpcHandlers(): void {
     store.set('theme', theme)
   })
 
+  ipcMain.handle(IpcEvents.StoreGetEditors, async () => {
+    const store = await getStore()
+    return store.get('editors')
+  })
+
+  ipcMain.handle(IpcEvents.StoreSetEditors, async (_, editors: EditorConfig) => {
+    const store = await getStore()
+    store.set('editors', editors)
+  })
+
   ipcMain.handle(IpcEvents.CloseWindow, async () => {
     console.log('Closing window')
     app.quit()
@@ -55,8 +65,11 @@ export function setupIpcHandlers(): void {
 
   ipcMain.handle(IpcEvents.LaunchCursor, async (_, directoryPath: string) => {
     try {
-      // Try to launch Cursor with the directory
-      spawn('cursor', [directoryPath], {
+      const store = await getStore()
+      const editors = store.get('editors')
+      const cursorBinary = editors.cursor || 'cursor'
+
+      spawn(cursorBinary, [directoryPath], {
         detached: true,
         stdio: 'ignore'
       })
@@ -72,8 +85,11 @@ export function setupIpcHandlers(): void {
 
   ipcMain.handle(IpcEvents.LaunchVscode, async (_, directoryPath: string) => {
     try {
-      // Try to launch VS Code with the directory
-      spawn('code', [directoryPath], {
+      const store = await getStore()
+      const editors = store.get('editors')
+      const vscodeBinary = editors.vscode || 'code'
+
+      spawn(vscodeBinary, [directoryPath], {
         detached: true,
         stdio: 'ignore'
       })
@@ -89,8 +105,9 @@ export function setupIpcHandlers(): void {
 
   ipcMain.handle(IpcEvents.LaunchTerminal, async (_, directoryPath: string) => {
     try {
-      // Try different terminal emulators in order of preference for Linux
-      const terminals = [
+      const store = await getStore()
+      const editors = store.get('editors')
+      const terminals = editors.terminal || [
         'gnome-terminal',
         'konsole',
         'xfce4-terminal',
@@ -152,8 +169,11 @@ export function setupIpcHandlers(): void {
 
   ipcMain.handle(IpcEvents.LaunchIdea, async (_, directoryPath: string) => {
     try {
-      // Try to launch in IDEA with the directory
-      spawn('idea', [directoryPath], {
+      const store = await getStore()
+      const editors = store.get('editors')
+      const ideaBinary = editors.idea || 'idea'
+
+      spawn(ideaBinary, [directoryPath], {
         detached: true,
         stdio: 'ignore'
       })

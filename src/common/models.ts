@@ -4,7 +4,15 @@ export type Repo = {
   lastOpened: Date
 }
 
+export type EditorConfig = {
+  cursor: string
+  vscode: string
+  idea: string
+  terminal: string[]
+}
+
 export type AppConfig = {
   theme: 'light' | 'dark'
   repos: Repo[]
+  editors: EditorConfig
 }

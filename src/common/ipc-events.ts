@@ -3,6 +3,8 @@ export const IpcEvents = {
   StoreSetRepos: 'store-set-repos',
   StoreGetTheme: 'store-get-theme',
   StoreSetTheme: 'store-set-theme',
+  StoreGetEditors: 'store-get-editors',
+  StoreSetEditors: 'store-set-editors',
   CloseWindow: 'close-window',
   SelectDirectory: 'select-directory',
   LaunchTerminal: 'launch-terminal',

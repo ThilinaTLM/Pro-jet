@@ -1,8 +1,9 @@
-import { Repo } from 'src/common/models'
+import { Repo, EditorConfig } from 'src/common/models'
 
 export interface AppStore {
   repos: Repo[]
   theme: 'light' | 'dark'
+  editors: EditorConfig
 }
 
 const schema = {
@@ -23,6 +24,25 @@ const schema = {
     type: 'string',
     enum: ['light', 'dark'],
     default: 'dark'
+  },
+  editors: {
+    type: 'object',
+    default: {
+      cursor: 'cursor',
+      vscode: 'code',
+      idea: 'idea',
+      terminal: ['gnome-terminal', 'konsole', 'xfce4-terminal', 'alacritty', 'kitty', 'xterm']
+    },
+    properties: {
+      cursor: { type: 'string' },
+      vscode: { type: 'string' },
+      idea: { type: 'string' },
+      terminal: {
+        type: 'array',
+        items: { type: 'string' }
+      }
+    },
+    required: ['cursor', 'vscode', 'idea', 'terminal']
   }
 } as const
 
@@ -36,7 +56,13 @@ export async function getStore() {
       schema,
       defaults: {
         repos: [],
-        theme: 'dark'
+        theme: 'dark',
+        editors: {
+          cursor: 'cursor',
+          vscode: 'code',
+          idea: 'idea',
+          terminal: ['gnome-terminal', 'konsole', 'xfce4-terminal', 'alacritty', 'kitty', 'xterm']
+        }
       }
     })
   }
