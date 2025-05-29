@@ -85,10 +85,10 @@ const MainView: React.FC = () => {
               </p>
             </div>
           </div>
-          <Button 
-            onClick={onAdd} 
+          <Button
+            onClick={onAdd}
             size="sm"
-            className="h-8 w-8 p-0" 
+            className="h-8 w-8 p-0"
             disabled={isAddingDirectory}
             title={isAddingDirectory ? 'Adding Directory...' : 'Add Directory'}
           >

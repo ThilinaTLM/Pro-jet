@@ -8,11 +8,13 @@ Develop a GUI application that simplifies launching single or multiple Cursor ed
 ## ✨ Key Features
 
 - **Directory Management**
+
   - List recently opened individual directories
   - Add/remove individual directories with one-click access
   - One-click launch for individual directories (`cursor <path-to-directory>`)
 
 - **Project Management**
+
   - Define "Projects" consisting of one or more directory paths
   - List and manage defined projects
   - One-click launch for projects (opens multiple `cursor` instances)
@@ -54,15 +56,16 @@ graph TD
 
 #### Sub-components:
 
-| Component | Description | Key Actions |
-|-----------|-------------|-------------|
-| `MainWindowView` | Main application window container | Display overall layout |
-| `DirectoryListView` | Individual directories management | Add, Remove, Launch Directory |
-| `ProjectListView` | Project management interface | Create, Edit, Delete, Launch Project |
-| `ProjectDefinitionModal` | Project creation/editing dialog | Multi-directory selection |
-| `DirectoryPicker` | Native file dialog integration | Directory selection |
+| Component                | Description                       | Key Actions                          |
+| ------------------------ | --------------------------------- | ------------------------------------ |
+| `MainWindowView`         | Main application window container | Display overall layout               |
+| `DirectoryListView`      | Individual directories management | Add, Remove, Launch Directory        |
+| `ProjectListView`        | Project management interface      | Create, Edit, Delete, Launch Project |
+| `ProjectDefinitionModal` | Project creation/editing dialog   | Multi-directory selection            |
+| `DirectoryPicker`        | Native file dialog integration    | Directory selection                  |
 
 #### Interactions:
+
 - **Outbound:** Sends commands via Electron IPC (`launch project X`, `add directory Y`)
 - **Inbound:** Receives data updates (project/directory lists) for display
 
@@ -72,13 +75,14 @@ graph TD
 
 #### Sub-components:
 
-| Component | Purpose | Key Methods |
-|-----------|---------|-------------|
-| `AppController` | IPC message handling & lifecycle management | `handleLaunchProject()`, `handleAddDirectory()` |
-| `ProjectService` | Project CRUD operations | `createProject()`, `updateProject()`, `deleteProject()` |
-| `DirectoryService` | Directory management | `addDirectory()`, `removeDirectory()`, `getRecentDirectories()` |
+| Component          | Purpose                                     | Key Methods                                                     |
+| ------------------ | ------------------------------------------- | --------------------------------------------------------------- |
+| `AppController`    | IPC message handling & lifecycle management | `handleLaunchProject()`, `handleAddDirectory()`                 |
+| `ProjectService`   | Project CRUD operations                     | `createProject()`, `updateProject()`, `deleteProject()`         |
+| `DirectoryService` | Directory management                        | `addDirectory()`, `removeDirectory()`, `getRecentDirectories()` |
 
 #### Interactions:
+
 - **Input:** UI requests via IPC
 - **Output:** Configuration persistence, command execution
 
@@ -87,24 +91,19 @@ graph TD
 **Responsibility:** Data persistence and configuration management
 
 #### Implementation:
+
 - **Storage:** JSON file (`~/.cursor-launcher/config.json`)
 - **Methods:** `loadConfiguration()`, `saveConfiguration(data)`
 
 #### Data Structure:
+
 ```json
 {
-  "recentDirectories": [
-    "/path/to/api",
-    "/path/to/web"
-  ],
+  "recentDirectories": ["/path/to/api", "/path/to/web"],
   "projects": [
     {
       "name": "My Main Project",
-      "paths": [
-        "/path/to/api",
-        "/path/to/web",
-        "/path/to/admin-panel"
-      ]
+      "paths": ["/path/to/api", "/path/to/web", "/path/to/admin-panel"]
     },
     {
       "name": "Side Project X",
@@ -119,6 +118,7 @@ graph TD
 **Responsibility:** Execute Cursor CLI commands
 
 #### Implementation:
+
 - **Technology:** Node.js `child_process` module
 - **Command Pattern:** `cursor <path-to-directory>`
 - **Error Handling:** Command not found, invalid paths, permission issues
@@ -163,6 +163,7 @@ sequenceDiagram
 ## 🚀 Application Initialization Flow
 
 1. **Startup**
+
    - `AppController` initializes
    - `ConfigurationManager` loads existing configuration
    - Services populate with saved data
@@ -175,7 +176,9 @@ sequenceDiagram
 ## ⚠️ Error Handling & Edge Cases
 
 ### Critical Issues
+
 - **Missing Dependencies**
+
   - `cursor` command not found in PATH
   - Display user-friendly error with installation guidance
 
@@ -185,6 +188,7 @@ sequenceDiagram
   - Corrupted configuration file
 
 ### Recovery Strategies
+
 - **Configuration Reset:** Provide option to reset to defaults
 - **Path Validation:** Check directory existence before launch
 - **Graceful Degradation:** Continue operation with valid entries only
