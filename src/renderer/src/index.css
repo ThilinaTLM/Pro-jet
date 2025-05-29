@@ -159,10 +159,18 @@
   }
 }
 
+/* Drag region */
 .drag-region {
+  -webkit-app-region: drag;
   app-region: drag;
 }
 
 .no-drag-region {
+  -webkit-app-region: no-drag;
   app-region: no-drag;
+}
+
+.fancy-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) var(--background);
 }

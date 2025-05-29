@@ -24,7 +24,8 @@ const api = {
     setTheme: (theme: 'light' | 'dark' | 'system'): Promise<void> =>
       ipcRenderer.invoke(IpcEvents.StoreSetTheme, theme),
     getEditors: (): Promise<EditorConfig> => ipcRenderer.invoke(IpcEvents.StoreGetEditors),
-    setEditors: (editors: EditorConfig): Promise<void> => ipcRenderer.invoke(IpcEvents.StoreSetEditors, editors)
+    setEditors: (editors: EditorConfig): Promise<void> =>
+      ipcRenderer.invoke(IpcEvents.StoreSetEditors, editors)
   }
 }
 

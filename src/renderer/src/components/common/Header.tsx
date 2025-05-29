@@ -2,13 +2,15 @@ import { FolderOpen, Settings } from 'lucide-react'
 import { cn } from '@renderer/lib/utils'
 import { X } from 'lucide-react'
 import { Button } from '../ui/button'
-import { useRoute } from '../context/RouteProvider'
+import { Route, useRoute } from '@renderer/components/context/RouteProvider'
 
 type HeaderProps = {
-  description: string
+  descriptions: {
+    [key in Route]: string
+  }
 }
 
-const Header = ({ description }: HeaderProps) => {
+const Header = ({ descriptions }: HeaderProps) => {
   const { route, setRoute } = useRoute()
 
   const onClose = async () => {
@@ -23,17 +25,20 @@ const Header = ({ description }: HeaderProps) => {
           </div>
           <div>
             <h1 className="text-lg font-semibold text-foreground">Projet</h1>
-            <p className="text-xs text-muted-foreground">{description}</p>
+            <p className="text-xs text-muted-foreground">{descriptions[route]}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
             size="sm"
-            className={cn('p-0 cursor-pointer no-drag-region', route === 'main' && 'bg-primary/10')}
-            onClick={() => setRoute(route === 'main' ? 'settings' : 'main')}
+            className={cn(
+              'p-0 cursor-pointer no-drag-region',
+              route === Route.main && 'bg-primary/10'
+            )}
+            onClick={() => setRoute(route === Route.main ? Route.settings : Route.main)}
           >
-            {route === 'main' ? (
+            {route === Route.main ? (
               <Settings className="h-5 w-5" />
             ) : (
               <FolderOpen className="h-5 w-5" />

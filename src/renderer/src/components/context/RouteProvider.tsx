@@ -1,11 +1,11 @@
 import { createContext, useContext, useState } from 'react'
 
-const Route = {
+export const Route = {
   main: 'main',
   settings: 'settings'
 } as const
 
-type Route = (typeof Route)[keyof typeof Route]
+export type Route = (typeof Route)[keyof typeof Route]
 
 const RouteContext = createContext<{
   route: Route

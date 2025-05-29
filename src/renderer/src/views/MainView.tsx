@@ -1,10 +1,8 @@
 import { Button } from '@renderer/components/ui/button'
 import { FolderOpen, Plus } from 'lucide-react'
-import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import { useRepos } from '@renderer/hooks/repos'
 import { useState } from 'react'
 import RepoItem from '@renderer/components/common/RepoItem'
-import Header from '@renderer/components/common/Header'
 
 const MainView: React.FC = () => {
   const { repos, addRepo, removeRepo, updateLastOpened, isLoading } = useRepos()
@@ -35,7 +33,7 @@ const MainView: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="h-full bg-background text-foreground flex items-center justify-center">
+      <div className="h-full flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-sm text-muted-foreground">Loading directories...</p>
@@ -45,36 +43,31 @@ const MainView: React.FC = () => {
   }
 
   return (
-    <div className="h-full bg-background text-foreground flex flex-col ">
-      {/* Header */}
-      <Header description={`${repos.length} ${repos.length === 1 ? 'directory' : 'directories'}`} />
-
+    <div className="h-full flex flex-col">
       {/* Content */}
-      <div className="flex-1 overflow-hidden">
-        <ScrollArea className="h-full">
-          {repos.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-64 px-6 text-center">
-              <div className="p-4 rounded-full bg-muted/50 mb-4">
-                <FolderOpen className="h-8 w-8 text-muted-foreground" />
-              </div>
-              <h3 className="text-sm font-medium text-foreground mb-1">No directories yet</h3>
-              <p className="text-xs text-muted-foreground max-w-[280px] leading-relaxed">
-                Add your first directory to get started with quick access to your projects
-              </p>
+      <div>
+        {repos.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-64 px-6 text-center">
+            <div className="p-4 rounded-full bg-muted/50 mb-4">
+              <FolderOpen className="h-8 w-8 text-muted-foreground" />
             </div>
-          ) : (
-            <div className="px-1 space-y-4">
-              {repos.map((repo) => (
-                <RepoItem
-                  key={repo.path}
-                  repo={repo}
-                  onRemove={onRemove}
-                  updateLastOpened={updateLastOpened}
-                />
-              ))}
-            </div>
-          )}
-        </ScrollArea>
+            <h3 className="text-sm font-medium text-foreground mb-1">No directories yet</h3>
+            <p className="text-xs text-muted-foreground max-w-[280px] leading-relaxed">
+              Add your first directory to get started with quick access to your projects
+            </p>
+          </div>
+        ) : (
+          <div className="px-1 space-y-4">
+            {repos.map((repo) => (
+              <RepoItem
+                key={repo.path}
+                repo={repo}
+                onRemove={onRemove}
+                updateLastOpened={updateLastOpened}
+              />
+            ))}
+          </div>
+        )}
       </div>
       <div className="flex-shrink-0 px-4 py-2 flex justify-end">
         <Button
