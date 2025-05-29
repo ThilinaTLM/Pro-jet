@@ -2,7 +2,7 @@ import { Button } from '@renderer/components/ui/button'
 import { FolderOpen, Plus, Trash2, ExternalLink } from 'lucide-react'
 import { Badge } from '@renderer/components/ui/badge'
 import { ScrollArea } from '@renderer/components/ui/scroll-area'
-import { useRepos } from '@renderer/hooks/repoStore'
+import { useRepos } from '@renderer/hooks/repos'
 import { useState } from 'react'
 
 const MainView: React.FC = () => {
