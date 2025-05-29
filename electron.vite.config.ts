@@ -12,7 +12,12 @@ export default defineConfig({
         }
       }
     },
-    plugins: [externalizeDepsPlugin()]
+    plugins: [externalizeDepsPlugin()],
+    resolve: {
+      alias: {
+        '@common': path.resolve(__dirname, 'src/common')
+      }
+    }
   },
   preload: {
     build: {
@@ -22,7 +27,12 @@ export default defineConfig({
         }
       }
     },
-    plugins: [externalizeDepsPlugin()]
+    plugins: [externalizeDepsPlugin()],
+    resolve: {
+      alias: {
+        '@common': path.resolve(__dirname, 'src/common')
+      }
+    }
   },
   renderer: {
     build: {
@@ -35,7 +45,8 @@ export default defineConfig({
     plugins: [react(), tailwindcss() as never],
     resolve: {
       alias: {
-        '@renderer': path.resolve(__dirname, 'src/renderer/src')
+        '@renderer': path.resolve(__dirname, 'src/renderer/src'),
+        '@common': path.resolve(__dirname, 'src/common')
       }
     }
   }
