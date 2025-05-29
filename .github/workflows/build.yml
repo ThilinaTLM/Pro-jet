@@ -18,7 +18,7 @@ jobs:
           - os: ubuntu-latest
             platform: linux
           - os: windows-latest
-            platform: windows
+            platform: win
 
     steps:
       - name: 📥 Checkout code
@@ -38,11 +38,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🔨 Build/package Electron app
-        uses: samuelmeuli/action-electron-builder@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          release: false
-          max_attempts: 1
+        run: pnpm run build:${{ matrix.platform }}
 
       - name: 🚀 Upload artifacts
         uses: actions/upload-artifact@v4
