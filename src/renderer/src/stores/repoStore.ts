@@ -59,10 +59,36 @@ export const useRepoStore = create<RepoStore>()(
       }
     }),
     {
-      name: 'repo-store'
+      name: 'repo-store',
+      storage: {
+        getItem: (name) => {
+          const str = localStorage.getItem(name)
+          if (!str) return null
+          const parsed = JSON.parse(str)
+          // Convert lastOpened strings back to Date objects
+          if (parsed.state?.repos) {
+            parsed.state.repos = parsed.state.repos.map((repo: any) => ({
+              ...repo,
+              lastOpened: new Date(repo.lastOpened)
+            }))
+          }
+          return parsed
+        },
+        setItem: (name, value) => {
+          localStorage.setItem(name, JSON.stringify(value))
+        },
+        removeItem: (name) => {
+          localStorage.removeItem(name)
+        }
+      }
     }
   )
 )
 
 export const useRepos = () => useRepoStore((state) => state.repos)
 export const useRepoActions = () => useRepoStore((state) => state.actions)
+
+export const useRecentRepos = () =>
+  useRepoStore((state) =>
+    state.repos.sort((a, b) => b.lastOpened.getTime() - a.lastOpened.getTime())
+  )

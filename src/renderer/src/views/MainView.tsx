@@ -4,11 +4,13 @@ import { FolderOpen, Plus, Trash2, ExternalLink } from 'lucide-react'
 import { Badge } from '@renderer/components/ui/badge'
 import { Separator } from '@renderer/components/ui/separator'
 import { ScrollArea } from '@renderer/components/ui/scroll-area'
-import { useRepos, useRepoActions } from '@renderer/stores/repoStore'
+import { useRepoActions, useRecentRepos } from '@renderer/stores/repoStore'
+import { useState } from 'react'
 
 const MainView: React.FC = () => {
-  const repos = useRepos()
-  const { removeRepo } = useRepoActions()
+  const repos = useRecentRepos()
+  const { removeRepo, addRepo, updateLastOpened } = useRepoActions()
+  const [isAddingDirectory, setIsAddingDirectory] = useState(false)
 
   const formatPath = (path: string): string => {
     const parts = path.split('/')
@@ -27,6 +29,40 @@ const MainView: React.FC = () => {
     removeRepo(path)
   }
 
+  const handleAddDirectory = async () => {
+    setIsAddingDirectory(true)
+    try {
+      const selectedPath = await window.api.selectDirectory()
+      if (selectedPath) {
+        const pathParts = selectedPath.split('/')
+        const label = pathParts[pathParts.length - 1] || selectedPath
+        addRepo({
+          label,
+          path: selectedPath
+        })
+      }
+    } catch (error) {
+      console.error('Failed to select directory:', error)
+    } finally {
+      setIsAddingDirectory(false)
+    }
+  }
+
+  const handleLaunchCursor = async (path: string) => {
+    try {
+      const result = await window.api.launchCursor(path)
+      if (result.success) {
+        // Update last opened time
+        updateLastOpened(path)
+      } else {
+        console.error('Failed to launch Cursor:', result.error)
+        // You could show a toast notification here
+      }
+    } catch (error) {
+      console.error('Failed to launch Cursor:', error)
+    }
+  }
+
   return (
     <Card className="h-full">
       <CardHeader>
@@ -35,9 +71,14 @@ const MainView: React.FC = () => {
             <FolderOpen className="h-5 w-5" />
             Recent Directories
           </CardTitle>
-          <Button onClick={() => {}} size="sm" className="gap-2">
+          <Button 
+            onClick={handleAddDirectory} 
+            size="sm" 
+            className="gap-2"
+            disabled={isAddingDirectory}
+          >
             <Plus className="h-4 w-4" />
-            Add
+            {isAddingDirectory ? 'Adding...' : 'Add'}
           </Button>
         </div>
       </CardHeader>
@@ -72,7 +113,7 @@ const MainView: React.FC = () => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => {}}
+                      onClick={() => handleLaunchCursor(repo.path)}
                       className="h-8 w-8 p-0"
                       title="Launch in Cursor"
                     >

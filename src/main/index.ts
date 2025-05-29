@@ -1,7 +1,8 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { spawn } from 'child_process'
 
 function createWindow(): void {
   // Create the browser window.
@@ -47,6 +48,32 @@ app.whenReady().then(() => {
   // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
+  })
+
+  // IPC handlers
+  ipcMain.handle('select-directory', async () => {
+    const result = await dialog.showOpenDialog({
+      properties: ['openDirectory']
+    })
+    
+    if (!result.canceled && result.filePaths.length > 0) {
+      return result.filePaths[0]
+    }
+    return null
+  })
+
+  ipcMain.handle('launch-cursor', async (_, directoryPath: string) => {
+    try {
+      // Try to launch Cursor with the directory
+      spawn('cursor', [directoryPath], { 
+        detached: true,
+        stdio: 'ignore'
+      })
+      return { success: true }
+    } catch (error) {
+      console.error('Failed to launch Cursor:', error)
+      return { success: false, error: 'Failed to launch Cursor. Make sure Cursor is installed and available in PATH.' }
+    }
   })
 
   // IPC test
