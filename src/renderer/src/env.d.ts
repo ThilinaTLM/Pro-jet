@@ -15,6 +15,9 @@ declare global {
       selectDirectory: () => Promise<string | null>
       launchCursor: (directoryPath: string) => Promise<{ success: boolean; error?: string }>
       launchVscode: (directoryPath: string) => Promise<{ success: boolean; error?: string }>
+      launchTerminal: (directoryPath: string) => Promise<{ success: boolean; error?: string }>
+      launchIdea: (directoryPath: string) => Promise<{ success: boolean; error?: string }>
+      closeWindow: () => Promise<void>
       store: {
         getRepos: () => Promise<Repo[]>
         setRepos: (repos: Repo[]) => Promise<void>

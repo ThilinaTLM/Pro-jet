@@ -9,7 +9,7 @@ export default defineConfig({
       rollupOptions: {
         input: {
           index: 'src/main/index.ts'
-        }
+        },
       }
     },
     plugins: [externalizeDepsPlugin()]

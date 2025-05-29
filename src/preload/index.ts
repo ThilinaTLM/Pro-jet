@@ -2,19 +2,38 @@ import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { Repo } from 'src/common/models'
 
+export const IpcEvents = {
+  StoreGetRepos: 'store-get-repos',
+  StoreSetRepos: 'store-set-repos',
+  StoreGetTheme: 'store-get-theme',
+  StoreSetTheme: 'store-set-theme',
+  CloseWindow: 'close-window',
+  SelectDirectory: 'select-directory',
+  LaunchTerminal: 'launch-terminal',
+  LaunchCursor: 'launch-cursor',
+  LaunchVscode: 'launch-vscode',
+  LaunchIdea: 'launch-idea'
+} as const
+
 // Custom APIs for renderer
 const api = {
-  selectDirectory: () => ipcRenderer.invoke('select-directory'),
-  launchCursor: (directoryPath: string) => ipcRenderer.invoke('launch-cursor', directoryPath),
-  launchVscode: (directoryPath: string) => ipcRenderer.invoke('launch-vscode', directoryPath),
+  closeWindow: () => ipcRenderer.invoke(IpcEvents.CloseWindow),
+  selectDirectory: () => ipcRenderer.invoke(IpcEvents.SelectDirectory),
+  launchCursor: (directoryPath: string) =>
+    ipcRenderer.invoke(IpcEvents.LaunchCursor, directoryPath),
+  launchVscode: (directoryPath: string) =>
+    ipcRenderer.invoke(IpcEvents.LaunchVscode, directoryPath),
+  launchTerminal: (directoryPath: string) =>
+    ipcRenderer.invoke(IpcEvents.LaunchTerminal, directoryPath),
+  launchIdea: (directoryPath: string) => ipcRenderer.invoke(IpcEvents.LaunchIdea, directoryPath),
 
   // Store APIs
   store: {
-    getRepos: (): Promise<Repo[]> => ipcRenderer.invoke('store-get-repos'),
-    setRepos: (repos: Repo[]): Promise<void> => ipcRenderer.invoke('store-set-repos', repos),
-    getTheme: (): Promise<'light' | 'dark'> => ipcRenderer.invoke('store-get-theme'),
+    getRepos: (): Promise<Repo[]> => ipcRenderer.invoke(IpcEvents.StoreGetRepos),
+    setRepos: (repos: Repo[]): Promise<void> => ipcRenderer.invoke(IpcEvents.StoreSetRepos, repos),
+    getTheme: (): Promise<'light' | 'dark'> => ipcRenderer.invoke(IpcEvents.StoreGetTheme),
     setTheme: (theme: 'light' | 'dark'): Promise<void> =>
-      ipcRenderer.invoke('store-set-theme', theme)
+      ipcRenderer.invoke(IpcEvents.StoreSetTheme, theme)
   }
 }
 

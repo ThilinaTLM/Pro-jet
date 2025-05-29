@@ -1,9 +1,10 @@
 import { Button } from '@renderer/components/ui/button'
-import { FolderOpen, Plus } from 'lucide-react'
+import { FolderOpen, Plus, X } from 'lucide-react'
 import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import { useRepos } from '@renderer/hooks/repos'
 import { useState } from 'react'
 import RepoItem from '@renderer/components/common/RepoItem'
+import { cn } from '@renderer/lib/utils'
 
 const MainView: React.FC = () => {
   const { repos, addRepo, removeRepo, updateLastOpened, isLoading } = useRepos()
@@ -32,30 +33,8 @@ const MainView: React.FC = () => {
     }
   }
 
-  const onLaunchCursor = async (path: string) => {
-    try {
-      const result = await window.api.launchCursor(path)
-      if (result.success) {
-        updateLastOpened(path)
-      } else {
-        console.error('Failed to launch Cursor:', result.error)
-      }
-    } catch (error) {
-      console.error('Failed to launch Cursor:', error)
-    }
-  }
-
-  const onLaunchVscode = async (path: string) => {
-    try {
-      const result = await window.api.launchVscode(path)
-      if (result.success) {
-        updateLastOpened(path)
-      } else {
-        console.error('Failed to launch VS Code:', result.error)
-      }
-    } catch (error) {
-      console.error('Failed to launch VS Code:', error)
-    }
+  const onClose = async () => {
+    await window.api.closeWindow()
   }
 
   if (isLoading) {
@@ -70,29 +49,28 @@ const MainView: React.FC = () => {
   }
 
   return (
-    <div className="h-full bg-background text-foreground flex flex-col">
+    <div className="h-full bg-background text-foreground flex flex-col ">
       {/* Header */}
-      <div className="flex-shrink-0 px-4 py-4 border-b border-border bg-background">
+      <div className="flex-shrink-0 px-4 py-2 drag-region">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-primary/10">
               <FolderOpen className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <h1 className="text-lg font-semibold text-foreground">Recent Directories</h1>
+              <h1 className="text-lg font-semibold text-foreground">Projet</h1>
               <p className="text-xs text-muted-foreground">
                 {repos.length} {repos.length === 1 ? 'directory' : 'directories'}
               </p>
             </div>
           </div>
           <Button
-            onClick={onAdd}
+            onClick={onClose}
             size="sm"
-            className="h-8 w-8 p-0"
-            disabled={isAddingDirectory}
-            title={isAddingDirectory ? 'Adding Directory...' : 'Add Directory'}
+            className={cn('p-0 cursor-pointer no-drag-region')}
+            variant="destructive"
           >
-            <Plus className="h-4 w-4" />
+            <X className="h-8 w-8" />
           </Button>
         </div>
       </div>
@@ -111,19 +89,29 @@ const MainView: React.FC = () => {
               </p>
             </div>
           ) : (
-            <div className="p-4 space-y-3">
+            <div className="p-2 space-y-3">
               {repos.map((repo) => (
                 <RepoItem
                   key={repo.path}
                   repo={repo}
                   onRemove={onRemove}
-                  onLaunchCursor={onLaunchCursor}
-                  onLaunchVscode={onLaunchVscode}
+                  updateLastOpened={updateLastOpened}
                 />
               ))}
             </div>
           )}
         </ScrollArea>
+      </div>
+      <div className="flex-shrink-0 px-4 py-2 flex justify-end">
+        <Button
+          onClick={onAdd}
+          size="sm"
+          className="h-8 w-8 p-0"
+          disabled={isAddingDirectory}
+          variant="outline"
+        >
+          <Plus className="h-4 w-4" />
+        </Button>
       </div>
     </div>
   )

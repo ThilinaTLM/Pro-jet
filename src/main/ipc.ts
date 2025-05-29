@@ -1,11 +1,24 @@
-import { ipcMain, dialog } from 'electron'
+import { ipcMain, dialog, app } from 'electron'
 import { spawn } from 'child_process'
 import { getStore } from './store'
 import { Repo } from 'src/common/models'
 
+export const IpcEvents = {
+  StoreGetRepos: 'store-get-repos',
+  StoreSetRepos: 'store-set-repos',
+  StoreGetTheme: 'store-get-theme',
+  StoreSetTheme: 'store-set-theme',
+  CloseWindow: 'close-window',
+  SelectDirectory: 'select-directory',
+  LaunchTerminal: 'launch-terminal',
+  LaunchCursor: 'launch-cursor',
+  LaunchVscode: 'launch-vscode',
+  LaunchIdea: 'launch-idea'
+} as const
+
 export function setupIpcHandlers(): void {
   // Store handlers
-  ipcMain.handle('store-get-repos', async () => {
+  ipcMain.handle(IpcEvents.StoreGetRepos, async () => {
     const store = await getStore()
     const repos = store.get('repos', [])
     // Convert lastOpened strings back to Date objects
@@ -15,7 +28,7 @@ export function setupIpcHandlers(): void {
     }))
   })
 
-  ipcMain.handle('store-set-repos', async (_, repos: Repo[]) => {
+  ipcMain.handle(IpcEvents.StoreSetRepos, async (_, repos: Repo[]) => {
     const store = await getStore()
     // Convert Date objects to strings for storage
     const serializedRepos = repos.map((repo) => ({
@@ -25,18 +38,23 @@ export function setupIpcHandlers(): void {
     store.set('repos', serializedRepos)
   })
 
-  ipcMain.handle('store-get-theme', async () => {
+  ipcMain.handle(IpcEvents.StoreGetTheme, async () => {
     const store = await getStore()
     return store.get('theme', 'dark')
   })
 
-  ipcMain.handle('store-set-theme', async (_, theme: 'light' | 'dark') => {
+  ipcMain.handle(IpcEvents.StoreSetTheme, async (_, theme: 'light' | 'dark') => {
     const store = await getStore()
     store.set('theme', theme)
   })
 
+  ipcMain.handle(IpcEvents.CloseWindow, async () => {
+    console.log('Closing window')
+    app.quit()
+  })
+
   // Directory selection handler
-  ipcMain.handle('select-directory', async () => {
+  ipcMain.handle(IpcEvents.SelectDirectory, async () => {
     const result = await dialog.showOpenDialog({
       properties: ['openDirectory']
     })
@@ -47,7 +65,7 @@ export function setupIpcHandlers(): void {
     return null
   })
 
-  ipcMain.handle('launch-cursor', async (_, directoryPath: string) => {
+  ipcMain.handle(IpcEvents.LaunchCursor, async (_, directoryPath: string) => {
     try {
       // Try to launch Cursor with the directory
       spawn('cursor', [directoryPath], {
@@ -64,7 +82,7 @@ export function setupIpcHandlers(): void {
     }
   })
 
-  ipcMain.handle('launch-vscode', async (_, directoryPath: string) => {
+  ipcMain.handle(IpcEvents.LaunchVscode, async (_, directoryPath: string) => {
     try {
       // Try to launch VS Code with the directory
       spawn('code', [directoryPath], {
@@ -81,6 +99,83 @@ export function setupIpcHandlers(): void {
     }
   })
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
+  ipcMain.handle(IpcEvents.LaunchTerminal, async (_, directoryPath: string) => {
+    try {
+      // Try different terminal emulators in order of preference for Linux
+      const terminals = [
+        'gnome-terminal',
+        'konsole',
+        'xfce4-terminal',
+        'alacritty',
+        'kitty',
+        'xterm'
+      ]
+
+      for (const terminal of terminals) {
+        try {
+          let args: string[] = []
+
+          // Different terminals have different ways to set working directory
+          switch (terminal) {
+            case 'gnome-terminal':
+              args = ['--working-directory', directoryPath]
+              break
+            case 'konsole':
+              args = ['--workdir', directoryPath]
+              break
+            case 'xfce4-terminal':
+              args = ['--working-directory', directoryPath]
+              break
+            case 'alacritty':
+              args = ['--working-directory', directoryPath]
+              break
+            case 'kitty':
+              args = ['--directory', directoryPath]
+              break
+            case 'xterm':
+              // xterm doesn't have a direct working directory option, so we'll use a different approach
+              args = ['-e', 'bash', '-c', `cd "${directoryPath}" && bash`]
+              break
+            default:
+              args = [directoryPath]
+          }
+
+          spawn(terminal, args, {
+            detached: true,
+            stdio: 'ignore'
+          })
+          return { success: true }
+        } catch (error) {
+          // Try next terminal
+          continue
+        }
+      }
+
+      // If all terminals fail, return error
+      throw new Error('No supported terminal found')
+    } catch (error) {
+      console.error('Failed to launch Terminal:', error)
+      return {
+        success: false,
+        error: 'Failed to launch Terminal. Make sure a terminal emulator is installed.'
+      }
+    }
+  })
+
+  ipcMain.handle(IpcEvents.LaunchIdea, async (_, directoryPath: string) => {
+    try {
+      // Try to launch in IDEA with the directory
+      spawn('idea', [directoryPath], {
+        detached: true,
+        stdio: 'ignore'
+      })
+      return { success: true }
+    } catch (error) {
+      console.error('Failed to launch Idea:', error)
+      return {
+        success: false,
+        error: 'Failed to launch Idea. Make sure Idea is installed and available in PATH.'
+      }
+    }
+  })
 }
