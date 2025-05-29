@@ -63,7 +63,7 @@ const MainView: React.FC = () => {
               </p>
             </div>
           ) : (
-            <div className="p-1 space-y-1">
+            <div className="px-1 space-y-4">
               {repos.map((repo) => (
                 <RepoItem
                   key={repo.path}
