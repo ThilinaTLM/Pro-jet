@@ -6,6 +6,7 @@ import cursorIcon from '@renderer/assets/cursor-app-icon.png'
 import vscodeIcon from '@renderer/assets/vscode-svgrepo-com.svg'
 import terminalIcon from '@renderer/assets/terminal-screen-svgrepo-com.svg'
 import ideaIcon from '@renderer/assets/intellij-idea-svgrepo-com.svg'
+import { Separator } from '@radix-ui/react-separator'
 
 type RepoItemProps = {
   repo: Repo
@@ -73,11 +74,11 @@ const RepoItem: React.FC<RepoItemProps> = ({ repo, onRemove, updateLastOpened })
   }
 
   return (
-    <div key={repo.path} className="relative bg-background p-3 border-b border-border/50">
+    <div key={repo.path} className="relative bg-background px-3">
       {/* Directory Info */}
-      <div className="mb-2 flex flex-col gap-1">
+      <div className="mb-2 flex flex-col gap-[1px]">
         <div
-          className="flex items-center text-[7pt] text-muted-foreground leading-4"
+          className="flex items-center text-[10px] text-muted-foreground leading-4"
           title={repo.path}
         >
           {pathSummary.map((segment, index, array) => (
@@ -101,16 +102,16 @@ const RepoItem: React.FC<RepoItemProps> = ({ repo, onRemove, updateLastOpened })
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between ">
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
             size="sm"
-            onClick={() => onLaunchCursor(repo.path)}
+            onClick={() => onLaunchTerminal(repo.path)}
             className="w-fit"
-            title="Open in Cursor"
+            title="Open in Terminal"
           >
-            <img src={cursorIcon} alt="Cursor" className="h-4 w-4" />
+            <img src={terminalIcon} alt="Terminal" className="h-4 w-4 dark:invert" />
           </Button>
           <Button
             variant="outline"
@@ -124,26 +125,28 @@ const RepoItem: React.FC<RepoItemProps> = ({ repo, onRemove, updateLastOpened })
           <Button
             variant="outline"
             size="sm"
-            onClick={() => onLaunchTerminal(repo.path)}
-            className="w-fit"
-            title="Open in Terminal"
-          >
-            <img src={terminalIcon} alt="Terminal" className="h-4 w-4 dark:invert" />
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
             onClick={() => onLaunchIdea(repo.path)}
             className="w-fit"
             title="Open in IntelliJ IDEA"
           >
             <img src={ideaIcon} alt="IntelliJ IDEA" className="h-4 w-4" />
           </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onLaunchCursor(repo.path)}
+            className="w-fit"
+            title="Open in Cursor"
+          >
+            <img src={cursorIcon} alt="Cursor" className="h-4 w-4" />
+          </Button>
         </div>
         <Button variant="ghost" size="sm" onClick={() => onRemove(repo.path)}>
           <Trash2 className="h-4 w-4 text-destructive" />
         </Button>
       </div>
+
+      <hr className="my-3" />
     </div>
   )
 }

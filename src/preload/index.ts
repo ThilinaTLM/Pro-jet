@@ -19,9 +19,12 @@ const api = {
   store: {
     getRepos: (): Promise<Repo[]> => ipcRenderer.invoke(IpcEvents.StoreGetRepos),
     setRepos: (repos: Repo[]): Promise<void> => ipcRenderer.invoke(IpcEvents.StoreSetRepos, repos),
-    getTheme: (): Promise<'light' | 'dark'> => ipcRenderer.invoke(IpcEvents.StoreGetTheme),
-    setTheme: (theme: 'light' | 'dark'): Promise<void> =>
-      ipcRenderer.invoke(IpcEvents.StoreSetTheme, theme)
+    getTheme: (): Promise<'light' | 'dark' | 'system'> =>
+      ipcRenderer.invoke(IpcEvents.StoreGetTheme),
+    setTheme: (theme: 'light' | 'dark' | 'system'): Promise<void> =>
+      ipcRenderer.invoke(IpcEvents.StoreSetTheme, theme),
+    getEditors: () => ipcRenderer.invoke(IpcEvents.StoreGetEditors),
+    setEditors: (editors: any) => ipcRenderer.invoke(IpcEvents.StoreSetEditors, editors)
   }
 }
 

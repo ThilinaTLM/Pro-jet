@@ -1,10 +1,10 @@
 import { Button } from '@renderer/components/ui/button'
-import { FolderOpen, Plus, X } from 'lucide-react'
+import { FolderOpen, Plus } from 'lucide-react'
 import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import { useRepos } from '@renderer/hooks/repos'
 import { useState } from 'react'
 import RepoItem from '@renderer/components/common/RepoItem'
-import { cn } from '@renderer/lib/utils'
+import Header from '@renderer/components/common/Header'
 
 const MainView: React.FC = () => {
   const { repos, addRepo, removeRepo, updateLastOpened, isLoading } = useRepos()
@@ -33,10 +33,6 @@ const MainView: React.FC = () => {
     }
   }
 
-  const onClose = async () => {
-    await window.api.closeWindow()
-  }
-
   if (isLoading) {
     return (
       <div className="h-full bg-background text-foreground flex items-center justify-center">
@@ -51,29 +47,7 @@ const MainView: React.FC = () => {
   return (
     <div className="h-full bg-background text-foreground flex flex-col ">
       {/* Header */}
-      <div className="flex-shrink-0 px-4 py-2 drag-region">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <FolderOpen className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-lg font-semibold text-foreground">Projet</h1>
-              <p className="text-xs text-muted-foreground">
-                {repos.length} {repos.length === 1 ? 'directory' : 'directories'}
-              </p>
-            </div>
-          </div>
-          <Button
-            onClick={onClose}
-            size="sm"
-            className={cn('p-0 cursor-pointer no-drag-region')}
-            variant="destructive"
-          >
-            <X className="h-8 w-8" />
-          </Button>
-        </div>
-      </div>
+      <Header description={`${repos.length} ${repos.length === 1 ? 'directory' : 'directories'}`} />
 
       {/* Content */}
       <div className="flex-1 overflow-hidden">

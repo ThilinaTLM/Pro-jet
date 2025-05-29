@@ -28,10 +28,10 @@ export function setupIpcHandlers(): void {
 
   ipcMain.handle(IpcEvents.StoreGetTheme, async () => {
     const store = await getStore()
-    return store.get('theme', 'dark')
+    return store.get('theme', 'system')
   })
 
-  ipcMain.handle(IpcEvents.StoreSetTheme, async (_, theme: 'light' | 'dark') => {
+  ipcMain.handle(IpcEvents.StoreSetTheme, async (_, theme: 'light' | 'dark' | 'system') => {
     const store = await getStore()
     store.set('theme', theme)
   })

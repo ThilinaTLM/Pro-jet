@@ -26,11 +26,29 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   storageKey = 'vite-ui-theme',
   ...props
 }) => {
-  const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
-  )
+  const [theme, setTheme] = useState<Theme>(defaultTheme)
+  const [isLoaded, setIsLoaded] = useState(false)
+
+  // Load theme from electron-store on mount
+  useEffect(() => {
+    const loadTheme = async () => {
+      try {
+        const storedTheme = await window.api.store.getTheme()
+        setTheme(storedTheme)
+      } catch (error) {
+        console.error('Failed to load theme from store:', error)
+        setTheme(defaultTheme)
+      } finally {
+        setIsLoaded(true)
+      }
+    }
+
+    loadTheme()
+  }, [defaultTheme])
 
   useEffect(() => {
+    if (!isLoaded) return
+
     const root = window.document.documentElement
 
     root.classList.remove('light', 'dark')
@@ -45,14 +63,29 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     }
 
     root.classList.add(theme)
-  }, [theme])
+  }, [theme, isLoaded])
 
   const value = {
     theme,
-    setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme)
-      setTheme(theme)
+    setTheme: async (theme: Theme) => {
+      try {
+        await window.api.store.setTheme(theme)
+        setTheme(theme)
+      } catch (error) {
+        console.error('Failed to save theme to store:', error)
+        // Still update the local state even if saving fails
+        setTheme(theme)
+      }
     }
+  }
+
+  // Don't render children until theme is loaded to prevent flash
+  if (!isLoaded) {
+    return (
+      <div className="h-screen w-screen bg-background text-foreground flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    )
   }
 
   return (

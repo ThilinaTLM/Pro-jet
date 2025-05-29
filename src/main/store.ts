@@ -2,7 +2,7 @@ import { Repo, EditorConfig } from 'src/common/models'
 
 export interface AppStore {
   repos: Repo[]
-  theme: 'light' | 'dark'
+  theme: 'light' | 'dark' | 'system'
   editors: EditorConfig
 }
 
@@ -22,8 +22,8 @@ const schema = {
   },
   theme: {
     type: 'string',
-    enum: ['light', 'dark'],
-    default: 'dark'
+    enum: ['light', 'dark', 'system'],
+    default: 'system'
   },
   editors: {
     type: 'object',
@@ -56,7 +56,7 @@ export async function getStore() {
       schema,
       defaults: {
         repos: [],
-        theme: 'dark',
+        theme: 'system',
         editors: {
           cursor: 'cursor',
           vscode: 'code',

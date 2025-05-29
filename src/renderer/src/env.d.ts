@@ -21,8 +21,10 @@ declare global {
       store: {
         getRepos: () => Promise<Repo[]>
         setRepos: (repos: Repo[]) => Promise<void>
-        getTheme: () => Promise<'light' | 'dark'>
-        setTheme: (theme: 'light' | 'dark') => Promise<void>
+        getTheme: () => Promise<'light' | 'dark' | 'system'>
+        setTheme: (theme: 'light' | 'dark' | 'system') => Promise<void>
+        getEditors: () => Promise<any>
+        setEditors: (editors: any) => Promise<void>
       }
     }
   }
