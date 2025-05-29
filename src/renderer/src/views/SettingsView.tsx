@@ -13,8 +13,6 @@ const SettingsView = () => {
     idea: 'idea',
     terminal: ['gnome-terminal', 'konsole', 'xfce4-terminal', 'alacritty', 'kitty', 'xterm']
   })
-  const [isLoading, setIsLoading] = useState(true)
-  const [isSaving, setIsSaving] = useState(false)
 
   // Load settings on component mount
   useEffect(() => {
@@ -28,8 +26,6 @@ const SettingsView = () => {
         setEditors(currentEditors)
       } catch (error) {
         console.error('Failed to load settings:', error)
-      } finally {
-        setIsLoading(false)
       }
     }
 
@@ -74,28 +70,11 @@ const SettingsView = () => {
   }
 
   const saveEditorSettings = async () => {
-    setIsSaving(true)
     try {
       await window.api.store.setEditors(editors)
     } catch (error) {
       console.error('Failed to save editor settings:', error)
-    } finally {
-      setIsSaving(false)
     }
-  }
-
-  if (isLoading) {
-    return (
-      <div className="h-full bg-background text-foreground flex flex-col">
-        <Header description="Settings" />
-        <div className="flex items-center justify-center flex-1">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-sm text-muted-foreground">Loading settings...</p>
-          </div>
-        </div>
-      </div>
-    )
   }
 
   return (
@@ -127,13 +106,8 @@ const SettingsView = () => {
             <div className="bg-background border border-border rounded-lg p-3">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-medium text-foreground">Editor Configurations</h3>
-                <Button
-                  onClick={saveEditorSettings}
-                  disabled={isSaving}
-                  size="sm"
-                  className="text-xs"
-                >
-                  {isSaving ? 'Saving...' : 'Save'}
+                <Button onClick={saveEditorSettings} size="sm" className="text-xs">
+                  Save
                 </Button>
               </div>
 
