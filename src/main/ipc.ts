@@ -28,6 +28,20 @@ export function setupIpcHandlers(): void {
     }
   })
 
+  ipcMain.handle('launch-vscode', async (_, directoryPath: string) => {
+    try {
+      // Try to launch VS Code with the directory
+      spawn('code', [directoryPath], { 
+        detached: true,
+        stdio: 'ignore'
+      })
+      return { success: true }
+    } catch (error) {
+      console.error('Failed to launch VS Code:', error)
+      return { success: false, error: 'Failed to launch VS Code. Make sure VS Code is installed and available in PATH.' }
+    }
+  })
+
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
 }

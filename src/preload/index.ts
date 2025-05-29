@@ -4,7 +4,8 @@ import { electronAPI } from '@electron-toolkit/preload'
 // Custom APIs for renderer
 const api = {
   selectDirectory: () => ipcRenderer.invoke('select-directory'),
-  launchCursor: (directoryPath: string) => ipcRenderer.invoke('launch-cursor', directoryPath)
+  launchCursor: (directoryPath: string) => ipcRenderer.invoke('launch-cursor', directoryPath),
+  launchVscode: (directoryPath: string) => ipcRenderer.invoke('launch-vscode', directoryPath)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

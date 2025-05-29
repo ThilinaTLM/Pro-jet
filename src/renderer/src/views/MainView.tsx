@@ -1,11 +1,9 @@
 import { Button } from '@renderer/components/ui/button'
-import { FolderOpen, Plus, Trash2, ExternalLink } from 'lucide-react'
-import { Badge } from '@renderer/components/ui/badge'
+import { FolderOpen, Plus } from 'lucide-react'
 import { ScrollArea } from '@renderer/components/ui/scroll-area'
 import { useRepos } from '@renderer/hooks/repos'
 import { useState } from 'react'
-import { formatPath } from '@renderer/lib/path'
-import { formatLastAccessed } from '@renderer/lib/date'
+import RepoItem from '@renderer/components/common/RepoItem'
 
 const MainView: React.FC = () => {
   const { repos, addRepo, removeRepo, updateLastOpened } = useRepos()
@@ -47,11 +45,24 @@ const MainView: React.FC = () => {
     }
   }
 
+  const onLaunchVscode = async (path: string) => {
+    try {
+      const result = await window.api.launchVscode(path)
+      if (result.success) {
+        updateLastOpened(path)
+      } else {
+        console.error('Failed to launch VS Code:', result.error)
+      }
+    } catch (error) {
+      console.error('Failed to launch VS Code:', error)
+    }
+  }
+
   return (
     <div className="h-full bg-background text-foreground flex flex-col">
       {/* Header */}
       <div className="flex-shrink-0 px-4 py-4 border-b border-border bg-background">
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-primary/10">
               <FolderOpen className="h-5 w-5 text-primary" />
@@ -63,11 +74,16 @@ const MainView: React.FC = () => {
               </p>
             </div>
           </div>
+          <Button 
+            onClick={onAdd} 
+            size="sm"
+            className="h-8 w-8 p-0" 
+            disabled={isAddingDirectory}
+            title={isAddingDirectory ? 'Adding Directory...' : 'Add Directory'}
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
         </div>
-        <Button onClick={onAdd} className="w-full gap-2 h-10" disabled={isAddingDirectory}>
-          <Plus className="h-4 w-4" />
-          {isAddingDirectory ? 'Adding Directory...' : 'Add Directory'}
-        </Button>
       </div>
 
       {/* Content */}
@@ -85,56 +101,14 @@ const MainView: React.FC = () => {
             </div>
           ) : (
             <div className="p-4 space-y-3">
-              {repos.map((repo, index) => (
-                <div
+              {repos.map((repo) => (
+                <RepoItem
                   key={repo.path}
-                  className="group relative bg-background border border-border rounded-lg p-4 hover:bg-accent/30 transition-all duration-200 hover:border-accent-foreground/20"
-                >
-                  {/* Directory Info */}
-                  <div className="mb-3">
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <h4 className="font-medium text-sm text-foreground truncate flex-1 leading-5">
-                        {formatPath(repo.path)}
-                      </h4>
-                      <Badge variant="secondary" className="text-xs shrink-0">
-                        {formatLastAccessed(repo.lastOpened)}
-                      </Badge>
-                    </div>
-                    <p
-                      className="text-xs text-muted-foreground truncate leading-4"
-                      title={repo.path}
-                    >
-                      {repo.path}
-                    </p>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="default"
-                      size="sm"
-                      onClick={() => onLaunchCursor(repo.path)}
-                      className="flex-1 gap-2 h-9"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                      Open in Cursor
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onRemove(repo.path)}
-                      className="h-9 w-9 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                      title="Remove directory"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-
-                  {/* Subtle separator line for visual hierarchy */}
-                  {index < repos.length - 1 && (
-                    <div className="absolute bottom-0 left-4 right-4 h-px bg-border/50" />
-                  )}
-                </div>
+                  repo={repo}
+                  onRemove={onRemove}
+                  onLaunchCursor={onLaunchCursor}
+                  onLaunchVscode={onLaunchVscode}
+                />
               ))}
             </div>
           )}

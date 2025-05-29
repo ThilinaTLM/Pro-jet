@@ -12,6 +12,7 @@ declare global {
     api: {
       selectDirectory: () => Promise<string | null>
       launchCursor: (directoryPath: string) => Promise<{ success: boolean; error?: string }>
+      launchVscode: (directoryPath: string) => Promise<{ success: boolean; error?: string }>
     }
   }
 }
