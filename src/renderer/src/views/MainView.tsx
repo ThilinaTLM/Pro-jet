@@ -1,15 +1,12 @@
 import { Button } from '@renderer/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@renderer/components/ui/card'
 import { FolderOpen, Plus, Trash2, ExternalLink } from 'lucide-react'
 import { Badge } from '@renderer/components/ui/badge'
-import { Separator } from '@renderer/components/ui/separator'
 import { ScrollArea } from '@renderer/components/ui/scroll-area'
-import { useRepoActions, useRecentRepos } from '@renderer/stores/repoStore'
+import { useRepos } from '@renderer/hooks/repoStore'
 import { useState } from 'react'
 
 const MainView: React.FC = () => {
-  const repos = useRecentRepos()
-  const { removeRepo, addRepo, updateLastOpened } = useRepoActions()
+  const { repos, addRepo, removeRepo, updateLastOpened } = useRepos()
   const [isAddingDirectory, setIsAddingDirectory] = useState(false)
 
   const formatPath = (path: string): string => {
@@ -19,6 +16,9 @@ const MainView: React.FC = () => {
 
   const formatLastAccessed = (date?: Date): string => {
     if (!date) return 'Never'
+    if (typeof date === 'string') {
+      date = new Date(date)
+    }
     return new Intl.RelativeTimeFormat('en', { numeric: 'auto' }).format(
       Math.floor((date.getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
       'day'
@@ -64,78 +64,100 @@ const MainView: React.FC = () => {
   }
 
   return (
-    <Card className="h-full">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <FolderOpen className="h-5 w-5" />
-            Recent Directories
-          </CardTitle>
-          <Button 
-            onClick={handleAddDirectory} 
-            size="sm" 
-            className="gap-2"
-            disabled={isAddingDirectory}
-          >
-            <Plus className="h-4 w-4" />
-            {isAddingDirectory ? 'Adding...' : 'Add'}
-          </Button>
+    <div className="h-full bg-background text-foreground flex flex-col">
+      {/* Header */}
+      <div className="flex-shrink-0 px-4 py-4 border-b border-border bg-background">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <FolderOpen className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-lg font-semibold text-foreground">Recent Directories</h1>
+              <p className="text-xs text-muted-foreground">
+                {repos.length} {repos.length === 1 ? 'directory' : 'directories'}
+              </p>
+            </div>
+          </div>
         </div>
-      </CardHeader>
-      <CardContent className="p-0">
-        <Separator />
-        <ScrollArea className="h-[400px] p-4">
+        <Button
+          onClick={handleAddDirectory}
+          className="w-full gap-2 h-10"
+          disabled={isAddingDirectory}
+        >
+          <Plus className="h-4 w-4" />
+          {isAddingDirectory ? 'Adding Directory...' : 'Add Directory'}
+        </Button>
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 overflow-hidden">
+        <ScrollArea className="h-full">
           {repos.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-32 text-muted-foreground">
-              <FolderOpen className="h-8 w-8 mb-2 opacity-50" />
-              <p className="text-sm">No directories added yet</p>
-              <p className="text-xs">Click "Add Directory" to get started</p>
+            <div className="flex flex-col items-center justify-center h-64 px-6 text-center">
+              <div className="p-4 rounded-full bg-muted/50 mb-4">
+                <FolderOpen className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <h3 className="text-sm font-medium text-foreground mb-1">No directories yet</h3>
+              <p className="text-xs text-muted-foreground max-w-[280px] leading-relaxed">
+                Add your first directory to get started with quick access to your projects
+              </p>
             </div>
           ) : (
-            <div className="space-y-3">
-              {repos.map((repo) => (
+            <div className="p-4 space-y-3">
+              {repos.map((repo, index) => (
                 <div
                   key={repo.path}
-                  className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+                  className="group relative bg-background border border-border rounded-lg p-4 hover:bg-accent/30 transition-all duration-200 hover:border-accent-foreground/20"
                 >
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-medium text-sm truncate">{formatPath(repo.path)}</h4>
-                      <Badge variant="secondary" className="text-xs">
+                  {/* Directory Info */}
+                  <div className="mb-3">
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <h4 className="font-medium text-sm text-foreground truncate flex-1 leading-5">
+                        {formatPath(repo.path)}
+                      </h4>
+                      <Badge variant="secondary" className="text-xs shrink-0">
                         {formatLastAccessed(repo.lastOpened)}
                       </Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground truncate" title={repo.path}>
+                    <p className="text-xs text-muted-foreground truncate leading-4" title={repo.path}>
                       {repo.path}
                     </p>
                   </div>
-                  <div className="flex items-center gap-1 ml-2">
+
+                  {/* Action Buttons */}
+                  <div className="flex items-center gap-2">
                     <Button
-                      variant="ghost"
+                      variant="default"
                       size="sm"
                       onClick={() => handleLaunchCursor(repo.path)}
-                      className="h-8 w-8 p-0"
-                      title="Launch in Cursor"
+                      className="flex-1 gap-2 h-9"
                     >
                       <ExternalLink className="h-4 w-4" />
+                      Open in Cursor
                     </Button>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleRemoveDirectory(repo.path)}
-                      className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                      className="h-9 w-9 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                       title="Remove directory"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
+
+                  {/* Subtle separator line for visual hierarchy */}
+                  {index < repos.length - 1 && (
+                    <div className="absolute bottom-0 left-4 right-4 h-px bg-border/50" />
+                  )}
                 </div>
               ))}
             </div>
           )}
         </ScrollArea>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }
 
