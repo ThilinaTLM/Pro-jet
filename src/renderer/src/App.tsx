@@ -1,12 +1,19 @@
-import { ThemeProvider } from '@renderer/components/context/ThemeProvider'
 import MainView from '@renderer/views/MainView'
+import SettingsView from '@renderer/views/SettingsView'
+import { useRoute } from './components/context/RouteProvider'
 
 function App() {
-  return (
-    <ThemeProvider>
-      <MainView />
-    </ThemeProvider>
-  )
+  const { route } = useRoute()
+
+  if (route === 'main') {
+    return <MainView />
+  }
+
+  if (route === 'settings') {
+    return <SettingsView />
+  }
+
+  return null
 }
 
 export default App

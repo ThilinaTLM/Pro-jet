@@ -6,7 +6,6 @@ import cursorIcon from '@renderer/assets/cursor-app-icon.png'
 import vscodeIcon from '@renderer/assets/vscode-svgrepo-com.svg'
 import terminalIcon from '@renderer/assets/terminal-screen-svgrepo-com.svg'
 import ideaIcon from '@renderer/assets/intellij-idea-svgrepo-com.svg'
-import { Separator } from '@radix-ui/react-separator'
 
 type RepoItemProps = {
   repo: Repo

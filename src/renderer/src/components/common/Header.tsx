@@ -1,13 +1,16 @@
-import { FolderOpen } from 'lucide-react'
+import { FolderOpen, Settings } from 'lucide-react'
 import { cn } from '@renderer/lib/utils'
 import { X } from 'lucide-react'
 import { Button } from '../ui/button'
+import { useRoute } from '../context/RouteProvider'
 
 type HeaderProps = {
   description: string
 }
 
 const Header = ({ description }: HeaderProps) => {
+  const { route, setRoute } = useRoute()
+
   const onClose = async () => {
     await window.api.closeWindow()
   }
@@ -23,14 +26,28 @@ const Header = ({ description }: HeaderProps) => {
             <p className="text-xs text-muted-foreground">{description}</p>
           </div>
         </div>
-        <Button
-          onClick={onClose}
-          size="sm"
-          className={cn('p-0 cursor-pointer no-drag-region')}
-          variant="destructive"
-        >
-          <X className="h-8 w-8" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className={cn('p-0 cursor-pointer no-drag-region', route === 'main' && 'bg-primary/10')}
+            onClick={() => setRoute(route === 'main' ? 'settings' : 'main')}
+          >
+            {route === 'main' ? (
+              <Settings className="h-5 w-5" />
+            ) : (
+              <FolderOpen className="h-5 w-5" />
+            )}
+          </Button>
+          <Button
+            onClick={onClose}
+            size="sm"
+            className={cn('p-0 cursor-pointer no-drag-region')}
+            variant="destructive"
+          >
+            <X className="h-8 w-8" />
+          </Button>
+        </div>
       </div>
     </div>
   )
