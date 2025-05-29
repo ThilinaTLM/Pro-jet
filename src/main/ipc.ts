@@ -1,8 +1,41 @@
 import { ipcMain, dialog } from 'electron'
 import { spawn } from 'child_process'
+import { getStore } from './store'
+import { Repo } from '../renderer/src/models'
 
 export function setupIpcHandlers(): void {
-  // IPC handlers
+  // Store handlers
+  ipcMain.handle('store-get-repos', async () => {
+    const store = await getStore()
+    const repos = store.get('repos', [])
+    // Convert lastOpened strings back to Date objects
+    return repos.map(repo => ({
+      ...repo,
+      lastOpened: new Date(repo.lastOpened)
+    }))
+  })
+
+  ipcMain.handle('store-set-repos', async (_, repos: Repo[]) => {
+    const store = await getStore()
+    // Convert Date objects to strings for storage
+    const serializedRepos = repos.map(repo => ({
+      ...repo,
+      lastOpened: repo.lastOpened.toISOString()
+    }))
+    store.set('repos', serializedRepos)
+  })
+
+  ipcMain.handle('store-get-theme', async () => {
+    const store = await getStore()
+    return store.get('theme', 'dark')
+  })
+
+  ipcMain.handle('store-set-theme', async (_, theme: 'light' | 'dark') => {
+    const store = await getStore()
+    store.set('theme', theme)
+  })
+
+  // Directory selection handler
   ipcMain.handle('select-directory', async () => {
     const result = await dialog.showOpenDialog({
       properties: ['openDirectory']

@@ -5,5 +5,6 @@ export type Repo = {
 }
 
 export type AppConfig = {
+  theme: 'light' | 'dark'
   repos: Repo[]
 }

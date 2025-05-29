@@ -1,5 +1,7 @@
 /// <reference types="vite/client" />
 
+import { Repo } from './models'
+
 declare global {
   interface Window {
     electron: {
@@ -13,6 +15,12 @@ declare global {
       selectDirectory: () => Promise<string | null>
       launchCursor: (directoryPath: string) => Promise<{ success: boolean; error?: string }>
       launchVscode: (directoryPath: string) => Promise<{ success: boolean; error?: string }>
+      store: {
+        getRepos: () => Promise<Repo[]>
+        setRepos: (repos: Repo[]) => Promise<void>
+        getTheme: () => Promise<'light' | 'dark'>
+        setTheme: (theme: 'light' | 'dark') => Promise<void>
+      }
     }
   }
 }

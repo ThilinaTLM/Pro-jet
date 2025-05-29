@@ -6,7 +6,7 @@ import { useState } from 'react'
 import RepoItem from '@renderer/components/common/RepoItem'
 
 const MainView: React.FC = () => {
-  const { repos, addRepo, removeRepo, updateLastOpened } = useRepos()
+  const { repos, addRepo, removeRepo, updateLastOpened, isLoading } = useRepos()
   const [isAddingDirectory, setIsAddingDirectory] = useState(false)
 
   const onRemove = (path: string) => {
@@ -56,6 +56,17 @@ const MainView: React.FC = () => {
     } catch (error) {
       console.error('Failed to launch VS Code:', error)
     }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="h-full bg-background text-foreground flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-sm text-muted-foreground">Loading directories...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
