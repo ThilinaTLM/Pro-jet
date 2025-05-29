@@ -1,6 +1,6 @@
 import MainView from '@renderer/views/MainView'
 import SettingsView from '@renderer/views/SettingsView'
-import { useRoute } from './components/context/RouteProvider'
+import { Route, useRoute } from './components/context/RouteProvider'
 import Header from './components/common/Header'
 import { useRepos } from './hooks/repos'
 
@@ -23,8 +23,8 @@ function App() {
       />
 
       <div className="grow-0 pt-3 overflow-y-scroll h-full fancy-scrollbar">
-        {route === 'main' && <MainView />}
-        {route === 'settings' && <SettingsView />}
+        {route === Route.main && <MainView />}
+        {route === Route.settings && <SettingsView />}
       </div>
     </div>
   )
