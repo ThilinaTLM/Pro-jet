@@ -1,13 +1,7 @@
-import { Button } from '@renderer/components/ui/button'
+import MainView from '@renderer/views/MainView'
 
 function App(): React.JSX.Element {
-  const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
-
-  return (
-    <div className="flex flex-col gap-4 p-2">
-      <Button onClick={ipcHandle}>Ping</Button>
-    </div>
-  )
+  return <MainView />
 }
 
 export default App
