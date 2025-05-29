@@ -19,7 +19,7 @@ export default tseslint.config(
   {
     files: ['**/*.{ts,tsx}'],
     plugins: {
-      'react-hooks': eslintPluginReactHooks,
+      //   'react-hooks': eslintPluginReactHooks,
       'react-refresh': eslintPluginReactRefresh
     },
     rules: {

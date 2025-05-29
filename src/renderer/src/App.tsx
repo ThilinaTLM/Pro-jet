@@ -1,14 +1,12 @@
 import { Button } from '@renderer/components/ui/button'
-import Versions from './components/Versions'
 
 function App(): React.JSX.Element {
   const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
 
   return (
-    <>
-      <Versions />
+    <div className="flex flex-col gap-4 p-2">
       <Button onClick={ipcHandle}>Ping</Button>
-    </>
+    </div>
   )
 }
 
