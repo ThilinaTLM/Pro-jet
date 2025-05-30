@@ -4,6 +4,7 @@ import eslintPluginReact from 'eslint-plugin-react'
 import eslintPluginReactHooks from 'eslint-plugin-react-hooks'
 import eslintPluginReactRefresh from 'eslint-plugin-react-refresh'
 
+
 export default tseslint.config(
   { ignores: ['**/node_modules', '**/dist', '**/out', 'src/renderer/src/components/ui'] },
   tseslint.configs.recommended,
@@ -28,4 +29,4 @@ export default tseslint.config(
     }
   },
   eslintConfigPrettier
-)
+);
