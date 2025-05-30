@@ -75,7 +75,7 @@ const RepoItem: React.FC<RepoItemProps> = ({ repo, onRemove, updateLastOpened })
   return (
     <div key={repo.path} className="relative bg-background flex flex-col gap-2">
       {/* Directory Info */}
-      <div className="mb-2 flex flex-col gap-[1px]">
+      <div className="flex flex-col gap-[1px]">
         <div
           className="flex items-center text-[10px] text-muted-foreground leading-4"
           title={repo.path}
@@ -153,7 +153,7 @@ const RepoItem: React.FC<RepoItemProps> = ({ repo, onRemove, updateLastOpened })
         </Button>
       </div>
 
-      <hr />
+      <hr className="border-muted-foreground/20" />
     </div>
   )
 }

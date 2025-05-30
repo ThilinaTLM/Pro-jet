@@ -99,18 +99,25 @@ const MainView: React.FC = () => {
           </div>
         )}
       </div>
-      <div
+      <motion.div
         className="flex-shrink-0 py-4 flex justify-center items-center"
         onClick={onAdd}
         draggable
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.2 }}
       >
-        <div className="w-full h-24 border-2 border-dashed rounded-lg flex items-center justify-center border-muted-foreground/20 text-muted-foreground hover:border-muted-foreground/40 transition-all duration-200">
+        <motion.div 
+          className="w-full h-24 border-2 border-dashed rounded-lg flex items-center justify-center border-muted-foreground/20 text-muted-foreground hover:border-muted-foreground/40 transition-all duration-200"
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.99 }}
+        >
           <div className="flex items-center gap-2 text-xs">
             <Upload className="h-3 w-3" />
             <span>Drop directories here to add them</span>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </DragDropZone>
   )
 }
