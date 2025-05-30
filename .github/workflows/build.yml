@@ -39,9 +39,14 @@ jobs:
 
       - name: 🏷️ Update package.json version
         run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
-          echo "Setting version to: $VERSION"
-          pnpm version $VERSION --no-git-tag-version
+          node -e "
+          const fs = require('fs');
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          const version = process.env.GITHUB_REF.replace('refs/tags/v', '');
+          console.log('Setting version to:', version);
+          pkg.version = version;
+          fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
+          "
 
       - name: 🔨 Build/package Electron app
         run: pnpm run build:${{ matrix.platform }}
