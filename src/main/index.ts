@@ -112,13 +112,13 @@ class ElectronApp {
       return {
         ...baseConfig,
         icon,
-        titleBarStyle: 'default'
+        titleBarStyle: 'hidden'
       }
     } else {
       // Windows
       return {
         ...baseConfig,
-        titleBarStyle: 'default'
+        titleBarStyle: 'hidden'
       }
     }
   }

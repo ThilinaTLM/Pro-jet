@@ -173,4 +173,5 @@
 .fancy-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: var(--primary) var(--background);
+  scrollbar-gutter: stable;
 }

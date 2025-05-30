@@ -79,7 +79,7 @@ const SettingsView = () => {
   return (
     <div className="h-full flex flex-col">
       <div className="flex-1">
-        <div className="px-4 py-2 space-y-4">
+        <div className="py-2 space-y-4">
           {/* Theme Settings */}
           <div className="bg-background border border-border rounded-lg p-3">
             <h3 className="text-sm font-medium mb-3 text-foreground">Theme</h3>

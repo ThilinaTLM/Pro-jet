@@ -22,7 +22,7 @@ function App() {
         }}
       />
 
-      <div className="grow-0 pt-3 overflow-y-scroll h-full fancy-scrollbar">
+      <div className="grow-0 pt-3 overflow-y-scroll h-full fancy-scrollbar pl-4 pr-1 ">
         {route === Route.main && <MainView />}
         {route === Route.settings && <SettingsView />}
       </div>

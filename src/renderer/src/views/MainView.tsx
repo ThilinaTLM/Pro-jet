@@ -72,7 +72,7 @@ const MainView: React.FC = () => {
             </p>
           </div>
         ) : (
-          <div className="px-1 space-y-4">
+          <div className="space-y-4">
             <AnimatePresence mode="popLayout">
               {sortedRepos.map((repo) => (
                 <motion.div
@@ -100,7 +100,7 @@ const MainView: React.FC = () => {
         )}
       </div>
       <div
-        className="flex-shrink-0 px-4 py-4 flex justify-center items-center"
+        className="flex-shrink-0 py-4 flex justify-center items-center"
         onClick={onAdd}
         draggable
       >

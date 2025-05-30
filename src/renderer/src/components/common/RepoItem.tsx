@@ -73,7 +73,7 @@ const RepoItem: React.FC<RepoItemProps> = ({ repo, onRemove, updateLastOpened })
   }
 
   return (
-    <div key={repo.path} className="relative bg-background px-3 flex flex-col gap-2">
+    <div key={repo.path} className="relative bg-background flex flex-col gap-2">
       {/* Directory Info */}
       <div className="mb-2 flex flex-col gap-[1px]">
         <div
