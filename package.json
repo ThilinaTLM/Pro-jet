@@ -1,6 +1,6 @@
 {
   "name": "projet",
-  "version": "0.1.0",
+  "version": "0.0.0-dev",
   "description": "A workspace manager for coding projects",
   "main": "./out/main/index.js",
   "author": "Thilina Lakshan",

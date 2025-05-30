@@ -37,6 +37,12 @@ jobs:
       - name: 📦 Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: 🏷️ Update package.json version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "Setting version to: $VERSION"
+          pnpm version $VERSION --no-git-tag-version
+
       - name: 🔨 Build/package Electron app
         run: pnpm run build:${{ matrix.platform }}
 
