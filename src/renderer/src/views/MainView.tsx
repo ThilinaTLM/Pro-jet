@@ -3,6 +3,7 @@ import { useRepos } from '@renderer/hooks/repos'
 import RepoItem from '@renderer/components/common/RepoItem'
 import DragDropZone from '@renderer/components/common/DragDropZone'
 import { AnimatePresence, motion } from 'framer-motion'
+import { formatPath } from '@renderer/lib/path'
 
 const MainView: React.FC = () => {
   const { repos, addRepo, removeRepo, updateLastOpened, isLoading } = useRepos()
@@ -21,8 +22,7 @@ const MainView: React.FC = () => {
     try {
       const selectedPath = await window.api.selectDirectory()
       if (selectedPath) {
-        const pathParts = selectedPath.split('/')
-        const label = pathParts[pathParts.length - 1] || selectedPath
+        const label = formatPath(selectedPath)
         addRepo({
           label,
           path: selectedPath
@@ -35,8 +35,7 @@ const MainView: React.FC = () => {
 
   const handleDrop = (paths: string[]) => {
     paths.forEach((path) => {
-      const pathParts = path.split('/')
-      const label = pathParts[pathParts.length - 1] || path
+      const label = formatPath(path)
       addRepo({
         label,
         path

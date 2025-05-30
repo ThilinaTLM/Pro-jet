@@ -123,47 +123,109 @@ export function setupIpcHandlers(): void {
     try {
       const store = await getStore()
       const editors = store.get('editors')
-      const terminals = editors.terminal || [
-        'gnome-terminal',
-        'konsole',
-        'xfce4-terminal',
-        'alacritty',
-        'kitty',
-        'xterm'
-      ]
+
+      // Platform-specific terminal configurations
+      let terminals: string[] = []
+
+      if (process.platform === 'win32') {
+        // Windows terminals
+        terminals = editors.terminal || [
+          'wt', // Windows Terminal
+          'cmd', // Command Prompt
+          'powershell' // PowerShell
+        ]
+      } else if (process.platform === 'darwin') {
+        // macOS terminals
+        terminals = editors.terminal || [
+          'open -a Terminal', // Default Terminal
+          'open -a iTerm', // iTerm2
+          'open -a Alacritty', // Alacritty
+          'open -a Kitty' // Kitty
+        ]
+      } else {
+        // Linux/Unix terminals
+        terminals = editors.terminal || [
+          'gnome-terminal',
+          'konsole',
+          'xfce4-terminal',
+          'alacritty',
+          'kitty',
+          'xterm'
+        ]
+      }
 
       for (const terminal of terminals) {
         try {
+          let command: string
           let args: string[] = []
 
-          // Different terminals have different ways to set working directory
-          switch (terminal) {
-            case 'gnome-terminal':
-              args = ['--working-directory', directoryPath]
-              break
-            case 'konsole':
-              args = ['--workdir', directoryPath]
-              break
-            case 'xfce4-terminal':
-              args = ['--working-directory', directoryPath]
-              break
-            case 'alacritty':
-              args = ['--working-directory', directoryPath]
-              break
-            case 'kitty':
-              args = ['--directory', directoryPath]
-              break
-            case 'xterm':
-              // xterm doesn't have a direct working directory option, so we'll use a different approach
-              args = ['-e', 'bash', '-c', `cd "${directoryPath}" && bash`]
-              break
-            default:
+          if (process.platform === 'win32') {
+            // Windows terminal handling
+            switch (terminal) {
+              case 'wt':
+                // Windows Terminal
+                command = 'wt'
+                args = ['-d', directoryPath]
+                break
+              case 'cmd':
+                // Command Prompt
+                command = 'cmd'
+                args = ['/c', 'start', 'cmd', '/k', `cd /d "${directoryPath}"`]
+                break
+              case 'powershell':
+                // PowerShell
+                command = 'powershell'
+                args = [
+                  '-Command',
+                  `Start-Process powershell -ArgumentList '-NoExit', '-Command', 'Set-Location "${directoryPath}"'`
+                ]
+                break
+              default:
+                command = terminal
+                args = [directoryPath]
+            }
+          } else if (process.platform === 'darwin') {
+            // macOS terminal handling
+            if (terminal.startsWith('open -a')) {
+              const appName = terminal.replace('open -a ', '')
+              command = 'open'
+              args = ['-a', appName, directoryPath]
+            } else {
+              command = terminal
               args = [directoryPath]
+            }
+          } else {
+            // Linux/Unix terminal handling
+            command = terminal
+            switch (terminal) {
+              case 'gnome-terminal':
+                args = ['--working-directory', directoryPath]
+                break
+              case 'konsole':
+                args = ['--workdir', directoryPath]
+                break
+              case 'xfce4-terminal':
+                args = ['--working-directory', directoryPath]
+                break
+              case 'alacritty':
+                args = ['--working-directory', directoryPath]
+                break
+              case 'kitty':
+                args = ['--directory', directoryPath]
+                break
+              case 'xterm':
+                // xterm doesn't have a direct working directory option
+                args = ['-e', 'bash', '-c', `cd "${directoryPath}" && bash`]
+                break
+              default:
+                args = [directoryPath]
+            }
           }
 
-          spawn(terminal, args, {
+          spawn(command, args, {
             detached: true,
-            stdio: 'ignore'
+            stdio: 'ignore',
+            shell: process.platform === 'win32' // Use shell on Windows for better compatibility
           })
           return { success: true }
         } catch (error) {
@@ -178,7 +240,7 @@ export function setupIpcHandlers(): void {
       console.error('Failed to launch Terminal:', error)
       return {
         success: false,
-        error: 'Failed to launch Terminal. Make sure a terminal emulator is installed.'
+        error: `Failed to launch Terminal on ${process.platform}. Make sure a terminal emulator is installed.`
       }
     }
   })
