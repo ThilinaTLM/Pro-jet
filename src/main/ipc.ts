@@ -1,9 +1,53 @@
-import { ipcMain, dialog, app, webUtils } from 'electron'
+import { ipcMain, dialog, app } from 'electron'
 import { spawn } from 'child_process'
-import { promises as fs } from 'fs'
 import { getStore } from './store'
 import { Repo, EditorConfig } from '@common/models'
 import { IpcEvents } from '@common/ipc-events'
+
+// Helper function to get platform-specific binary names with fallbacks
+function getPlatformBinary(baseName: string, customBinary?: string): string[] {
+  if (customBinary) {
+    return [customBinary]
+  }
+
+  const platform = process.platform
+  const binaries: string[] = []
+
+  if (platform === 'win32') {
+    // Windows: try both with and without .exe extension
+    binaries.push(`${baseName}.exe`, baseName)
+  } else {
+    // macOS and Linux: use base name
+    binaries.push(baseName)
+  }
+
+  return binaries
+}
+
+// Helper function to try launching with multiple binary options
+async function tryLaunchEditor(
+  binaries: string[],
+  directoryPath: string,
+  editorName: string
+): Promise<{ success: boolean; error?: string }> {
+  for (const binary of binaries) {
+    try {
+      spawn(binary, [directoryPath], {
+        detached: true,
+        stdio: 'ignore'
+      })
+      return { success: true }
+    } catch (error) {
+      // Continue to next binary option
+      continue
+    }
+  }
+
+  return {
+    success: false,
+    error: `Failed to launch ${editorName}. Make sure ${editorName} is installed and available in PATH. Tried: ${binaries.join(', ')}`
+  }
+}
 
 export function setupIpcHandlers(): void {
   // Store handlers
@@ -64,32 +108,13 @@ export function setupIpcHandlers(): void {
     return null
   })
 
-  // Check if path is directory handler
-  ipcMain.handle(IpcEvents.CheckIsDirectory, async (_, file: File) => {
-    try {
-      const path = await webUtils.getPathForFile(file)
-      const stats = await fs.stat(path)
-      if (stats.isDirectory()) {
-        return path
-      }
-      return null
-    } catch (error) {
-      console.error('Error checking if path is directory:', error)
-      return null
-    }
-  })
-
   ipcMain.handle(IpcEvents.LaunchCursor, async (_, directoryPath: string) => {
     try {
       const store = await getStore()
       const editors = store.get('editors')
-      const cursorBinary = editors.cursor || 'cursor'
+      const binaries = getPlatformBinary('cursor', editors.cursor)
 
-      spawn(cursorBinary, [directoryPath], {
-        detached: true,
-        stdio: 'ignore'
-      })
-      return { success: true }
+      return await tryLaunchEditor(binaries, directoryPath, 'Cursor')
     } catch (error) {
       console.error('Failed to launch Cursor:', error)
       return {
@@ -103,13 +128,9 @@ export function setupIpcHandlers(): void {
     try {
       const store = await getStore()
       const editors = store.get('editors')
-      const vscodeBinary = editors.vscode || 'code'
+      const binaries = getPlatformBinary('code', editors.vscode)
 
-      spawn(vscodeBinary, [directoryPath], {
-        detached: true,
-        stdio: 'ignore'
-      })
-      return { success: true }
+      return await tryLaunchEditor(binaries, directoryPath, 'VS Code')
     } catch (error) {
       console.error('Failed to launch VS Code:', error)
       return {
@@ -124,35 +145,8 @@ export function setupIpcHandlers(): void {
       const store = await getStore()
       const editors = store.get('editors')
 
-      // Platform-specific terminal configurations
-      let terminals: string[] = []
-
-      if (process.platform === 'win32') {
-        // Windows terminals
-        terminals = editors.terminal || [
-          'wt', // Windows Terminal
-          'cmd', // Command Prompt
-          'powershell' // PowerShell
-        ]
-      } else if (process.platform === 'darwin') {
-        // macOS terminals
-        terminals = editors.terminal || [
-          'open -a Terminal', // Default Terminal
-          'open -a iTerm', // iTerm2
-          'open -a Alacritty', // Alacritty
-          'open -a Kitty' // Kitty
-        ]
-      } else {
-        // Linux/Unix terminals
-        terminals = editors.terminal || [
-          'gnome-terminal',
-          'konsole',
-          'xfce4-terminal',
-          'alacritty',
-          'kitty',
-          'xterm'
-        ]
-      }
+      // Use configured terminals from store (which now has platform-specific defaults)
+      const terminals = editors.terminal
 
       for (const terminal of terminals) {
         try {
@@ -181,7 +175,9 @@ export function setupIpcHandlers(): void {
                 ]
                 break
               default:
-                command = terminal
+                // Try as direct command with .exe fallback
+                const binaries = getPlatformBinary(terminal)
+                command = binaries[0]
                 args = [directoryPath]
             }
           } else if (process.platform === 'darwin') {
@@ -218,7 +214,7 @@ export function setupIpcHandlers(): void {
                 args = ['-e', 'bash', '-c', `cd "${directoryPath}" && bash`]
                 break
               default:
-                args = [directoryPath]
+                args = ['--working-directory', directoryPath] // Generic fallback
             }
           }
 
@@ -240,7 +236,7 @@ export function setupIpcHandlers(): void {
       console.error('Failed to launch Terminal:', error)
       return {
         success: false,
-        error: `Failed to launch Terminal on ${process.platform}. Make sure a terminal emulator is installed.`
+        error: `Failed to launch Terminal on ${process.platform}`
       }
     }
   })
@@ -249,18 +245,28 @@ export function setupIpcHandlers(): void {
     try {
       const store = await getStore()
       const editors = store.get('editors')
-      const ideaBinary = editors.idea || 'idea'
+      
+      // IntelliJ IDEA has different binary names on different platforms
+      let binaries: string[]
+      if (editors.idea) {
+        binaries = [editors.idea]
+      } else {
+        const platform = process.platform
+        if (platform === 'win32') {
+          binaries = ['idea64.exe', 'idea64', 'idea.exe', 'idea']
+        } else if (platform === 'darwin') {
+          binaries = ['idea', '/Applications/IntelliJ IDEA.app/Contents/MacOS/idea']
+        } else {
+          binaries = ['idea', 'intellij-idea-ultimate', 'intellij-idea-community']
+        }
+      }
 
-      spawn(ideaBinary, [directoryPath], {
-        detached: true,
-        stdio: 'ignore'
-      })
-      return { success: true }
+      return await tryLaunchEditor(binaries, directoryPath, 'IntelliJ IDEA')
     } catch (error) {
-      console.error('Failed to launch Idea:', error)
+      console.error('Failed to launch IntelliJ IDEA:', error)
       return {
         success: false,
-        error: 'Failed to launch Idea. Make sure Idea is installed and available in PATH.'
+        error: 'Failed to launch IntelliJ IDEA. Make sure IntelliJ IDEA is installed and available in PATH.'
       }
     }
   })

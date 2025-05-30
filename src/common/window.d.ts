@@ -6,7 +6,6 @@ declare global {
     electron: ElectronAPI
     api: {
       selectDirectory: () => Promise<string | null>
-      checkIsDirectory: (file: File) => Promise<string | null>
       launchCursor: (directoryPath: string) => Promise<{ success: boolean; error?: string }>
       launchVscode: (directoryPath: string) => Promise<{ success: boolean; error?: string }>
       launchTerminal: (directoryPath: string) => Promise<{ success: boolean; error?: string }>

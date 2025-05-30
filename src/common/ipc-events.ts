@@ -7,7 +7,6 @@ export const IpcEvents = {
   StoreSetEditors: 'store-set-editors',
   CloseWindow: 'close-window',
   SelectDirectory: 'select-directory',
-  CheckIsDirectory: 'check-is-directory',
   LaunchTerminal: 'launch-terminal',
   LaunchCursor: 'launch-cursor',
   LaunchVscode: 'launch-vscode',
